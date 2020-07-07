@@ -21,7 +21,10 @@ def print_dict(**kwarg):
     
     if 'para' in kwarg.keys():
         if kwarg['para'] in d.keys():
-            print('There is the key in that dictionary')
+            print('There is the key \"%d\" in that dictionary'\
+                  %(kwarg['para']))
+            print('There is the key \"{number}\" in that dictionary'\
+                  .format(number = kwarg['para']))
         else:
             print("Sorry, There is not in that dictionary")
     else:
@@ -29,6 +32,12 @@ def print_dict(**kwarg):
 
 
 print_dict(para = 1)
+
+a = (1, 2, 3)
+b = (4, 5)
+c = (6, )
+
+print(a+b+c)
 
 
     
