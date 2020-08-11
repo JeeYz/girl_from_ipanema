@@ -24,7 +24,7 @@ class make_files_list_asr:
         
     def make_files_list_file(self):
         result_filename = 'result.txt'
-        temp = self.make_file_path +'/'+ result_filename
+        temp = self.make_file_path +'\\'+ result_filename
         with open(temp, 'w', encoding='utf-8') as wf:
             for one_file in self.return_files_list:
                 wf.write(one_file)
@@ -34,7 +34,7 @@ class make_files_list_asr:
         
     
     def find_target_files(self):
-        
+        self.return_files_list = []
         for (path, dir, files) in os.walk(self.path):
             for filename in files:
                 ext = os.path.splitext(filename)[-1]
@@ -54,11 +54,14 @@ class make_files_list_asr:
 if __name__ == '__main__':
     a = make_files_list_asr(path="d:\\ASR_audio_files",
                             file_format=".wav",
-                            return_file_path="c:\\Users\\jyback_path\\Desktop")
-    a.find_target_files()
+                            return_file_path="c:\\Users\\jyback_pnc\\Desktop")
     
-    for el in a.return_files_list:
-        print(el)
+    a.make_file_process()
+    
+    # a.find_target_files()
+    
+    # for el in a.return_files_list:
+    #     print(el)
     
     
     
