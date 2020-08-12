@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+from scipy.io import wavfile
+import numpy as np
+import time
 
 
 class make_files_list_asr:
@@ -13,9 +16,59 @@ class make_files_list_asr:
             self.file_format = kwarg["file_format"]
         if "return_file_path" in kwarg.keys():
             self.make_file_path = kwarg["return_file_path"]
-    
-        self.return_files_list = []
         
+        self.return_files_list = []
+        self.label_dict = dict()
+        self.make_label_dict()
+        
+        
+    def make_label_dict(self, t_path): # t_path is label file's path
+        none_list = ['hibixbi', 'hiplus', 'okgoogle']
+        label_num = 0
+        with open(t_path, 'r', encoding='utf-8') as f:
+            while True:
+                line = f.readline()
+                if not line:break
+                line = line.split()
+                
+                if line[0] not in none_list:
+                    self.label_dict[line[0]] = label_num
+                    label_num += 1 
+    
+        
+    def read_wav_file(self):
+        result_filename = 'result.txt'
+        result_binary = 'result_numpy.npy'
+        temp = self.make_file_path +'\\'+ result_filename
+        temp_1 = self.make_file_path +'\\'+ result_binary
+        with open(temp, 'r', encoding='utf-8') as fr,\
+        open(temp_1, 'wb') as fwb:
+            while True:
+                line = fr.readline()
+                line = line.split('\n')[0]
+                if not line: break
+                # print(line)
+                fs, data = wavfile.read(line)
+                # print(fs)
+                # print(data)
+                tline = line.split('\\')
+                if tline[-2] in self.label_dict.keys():
+                    # print(self.label_dict[tline[-2]])
+                    a = np.array([self.label_dict[tline[-2]]])
+                elif tline[-2] == 'hipnc2':
+                    # print(self.label_dict['hipnc'])
+                    a = np.array([self.label_dict['hipnc']])
+                else:
+                    # print(self.label_dict['none'])
+                    a = np.array([self.label_dict['none']])
+                
+                result = np.append(a, data)
+                # print(result)
+                # print(len(result))
+                np.save(fwb, result)
+                
+        return
+    
         
     def make_file_process(self):        
         self.find_target_files()
@@ -52,18 +105,7 @@ class make_files_list_asr:
 
 
 if __name__ == '__main__':
-    a = make_files_list_asr(path="d:\\ASR_audio_files",
-                            file_format=".wav",
-                            return_file_path="c:\\Users\\jyback_pnc\\Desktop")
-    
-    a.make_file_process()
-    
-    # a.find_target_files()
-    
-    # for el in a.return_files_list:
-    #     print(el)
-    
-    
+    print("hello, world~!")
     
     
     
