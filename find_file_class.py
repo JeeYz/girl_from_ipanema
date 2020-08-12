@@ -40,11 +40,12 @@ class make_files_list_asr:
         
     def read_wav_file(self):
         result_filename = 'result.txt'
-        result_binary = 'result_numpy.npz'
+        result_binary = 'result_numpy_raw_sig.npz'
         temp = self.make_file_path +'\\'+ result_filename
         temp_1 = self.make_file_path +'\\'+ result_binary
         data_list = list()
         label_list = list()
+        sr_list = list()
         with open(temp, 'r', encoding='utf-8') as fr,\
         open(temp_1, 'wb') as fwb:
             while True:
@@ -68,11 +69,13 @@ class make_files_list_asr:
                 
                 data_list.append(data)
                 label_list.append(a)
+                sr_list.append(fs)
                 # print(result)
                 # print(len(result))
             data_list = np.asarray(data_list)
             label_list = np.asarray(label_list)
-            np.savez_compressed(fwb, label=label_list, data=data_list)
+            sr_list = np.asarray(sr_list)
+            np.savez_compressed(fwb, label=label_list, data=data_list, rate=sr_list)
                 
         return
     
@@ -113,6 +116,7 @@ class make_files_list_asr:
 
 if __name__ == '__main__':
     print("hello, world~!")
+    
     
     
     
