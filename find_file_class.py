@@ -16,10 +16,12 @@ class make_files_list_asr:
             self.file_format = kwarg["file_format"]
         if "return_file_path" in kwarg.keys():
             self.make_file_path = kwarg["return_file_path"]
+        if "label_file_path" in kwarg.keys():
+            temp = kwarg["label_file_path"]
         
         self.return_files_list = []
         self.label_dict = dict()
-        self.make_label_dict()
+        self.make_label_dict(temp)
         
         
     def make_label_dict(self, t_path): # t_path is label file's path
@@ -38,9 +40,11 @@ class make_files_list_asr:
         
     def read_wav_file(self):
         result_filename = 'result.txt'
-        result_binary = 'result_numpy.npy'
+        result_binary = 'result_numpy.npz'
         temp = self.make_file_path +'\\'+ result_filename
         temp_1 = self.make_file_path +'\\'+ result_binary
+        data_list = list()
+        label_list = list()
         with open(temp, 'r', encoding='utf-8') as fr,\
         open(temp_1, 'wb') as fwb:
             while True:
@@ -62,10 +66,13 @@ class make_files_list_asr:
                     # print(self.label_dict['none'])
                     a = np.array([self.label_dict['none']])
                 
-                result = np.append(a, data)
+                data_list.append(data)
+                label_list.append(a)
                 # print(result)
                 # print(len(result))
-                np.save(fwb, result)
+            data_list = np.asarray(data_list)
+            label_list = np.asarray(label_list)
+            np.savez_compressed(fwb, label=label_list, data=data_list)
                 
         return
     
@@ -106,7 +113,6 @@ class make_files_list_asr:
 
 if __name__ == '__main__':
     print("hello, world~!")
-    
     
     
     
