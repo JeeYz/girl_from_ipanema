@@ -104,11 +104,12 @@ class norm_cnn(layers.Layer):
                             kernel_size=(3,3), pooling_bool=False,
                             dropout_value=0.3)        
         
+        x = layers.GlobalAveragePooling2D()(x)
+        
         x = layers.Flatten()(x)
-        
-        x = layers.Dense(512, activation='linear')(x)
-        # x = layers.Dropout(0.4)(x)
-        
+        # x = layers.Dropout(0.2)(x)
+        x = layers.Dense(256, activation='linear')(x)
+        # x = layers.Dropout(0.3)(x)
         output_val = layers.Dense(num_class, activation='softmax')(x)
         
         return output_val
