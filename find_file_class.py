@@ -6,12 +6,15 @@ import numpy as np
 import time
 
 
+#%% class init && make label dict
 class make_files_list_asr:
     
     def __init__(self, **kwarg):
         
-        if "path" in kwarg.keys():
-            self.path = kwarg["path"]
+        if "find_dir_path" in kwarg.keys():
+            find_dir_path = kwarg["find_dir_path"]
+            self.train_dir_path = find_dir_path + '\\train'
+            self.test_dir_path = find_dir_path + '\\test'
         if "file_format" in kwarg.keys():
             self.file_format = kwarg["file_format"]
         if "return_file_path" in kwarg.keys():
@@ -19,11 +22,12 @@ class make_files_list_asr:
         if "label_file_path" in kwarg.keys():
             temp = kwarg["label_file_path"]
         
-        self.return_files_list = []
+        self.train_files_list = []
+        self.test_files_list = []
         self.label_dict = dict()
         self.make_label_dict(temp)
         
-        
+    
     def make_label_dict(self, t_path): # t_path is label file's path
         none_list = ['hibixbi', 'hiplus', 'okgoogle']
         label_num = 0
@@ -37,15 +41,23 @@ class make_files_list_asr:
                     self.label_dict[line[0]] = label_num
                     label_num += 1 
     
+ 
+#%% read wav file and make numpy binary file
+    def read_wav_file(self, **kwarg):
         
-    def read_wav_file(self):
-        result_filename = 'result.txt'
-        result_binary = 'result_numpy_raw_sig.npz'
-        temp = self.make_file_path +'\\'+ result_filename
+        if "numpy_data_filename" in kwarg.keys():
+            result_binary = kwarg["numpy_data_filename"]
+        
+        if "text_file_list" in kwarg.keys():
+            text_filename = kwarg["text_file_list"]
+        
+        temp = self.make_file_path +'\\'+ text_filename
         temp_1 = self.make_file_path +'\\'+ result_binary
+        
         data_list = list()
         label_list = list()
         sr_list = list()
+        
         with open(temp, 'r', encoding='utf-8') as fr,\
         open(temp_1, 'wb') as fwb:
             while True:
@@ -72,6 +84,7 @@ class make_files_list_asr:
                 sr_list.append(fs)
                 # print(result)
                 # print(len(result))
+                
             data_list = np.asarray(data_list)
             label_list = np.asarray(label_list)
             sr_list = np.asarray(sr_list)
@@ -79,32 +92,49 @@ class make_files_list_asr:
                 
         return
     
-        
-    def make_file_process(self):        
+#%% # this func is for making files list
+    def make_file_process(self):     
         self.find_target_files()
         self.make_files_list_file()
         
-        
+
+#%% make file of files list
     def make_files_list_file(self):
-        result_filename = 'result.txt'
-        temp = self.make_file_path +'\\'+ result_filename
+        train_text_filename = 'train_text.txt'
+        test_text_filename = 'test_text.txt'
+        
+        temp = self.make_file_path +'\\'+ train_text_filename
         with open(temp, 'w', encoding='utf-8') as wf:
-            for one_file in self.return_files_list:
+            for one_file in self.train_files_list:
+                wf.write(one_file)
+                wf.write("\n")
+                
+        temp = self.make_file_path +'\\'+ test_text_filename
+        with open(temp, 'w', encoding='utf-8') as wf:
+            for one_file in self.test_files_list:
                 wf.write(one_file)
                 wf.write("\n")
         
         return
         
-    
+
+#%% find files in recursive mechanism
     def find_target_files(self):
-        self.return_files_list = []
-        for (path, dir, files) in os.walk(self.path):
+
+        for (path, dir, files) in os.walk(self.train_dir_path):
             for filename in files:
                 ext = os.path.splitext(filename)[-1]
                 if ext == self.file_format:
-                    self.return_files_list.append(path+'\\'+filename)
+                    self.train_files_list.append(path+'\\'+filename)
+        
+        for (path, dir, files) in os.walk(self.test_dir_path):
+            for filename in files:
+                ext = os.path.splitext(filename)[-1]
+                if ext == self.file_format:
+                    self.test_files_list.append(path+'\\'+filename)
 
-    
+
+#%% find sub dics and files
     def return_directories_name(self):
         
         Target_list = os.listdir(self.path)
@@ -113,7 +143,7 @@ class make_files_list_asr:
         return Target_list_data
 
 
-
+#%% __main__
 if __name__ == '__main__':
     print("hello, world~!")
     

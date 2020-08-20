@@ -37,7 +37,10 @@ class make_train_data:
         return
     
     
-    def make_train_mfcc_with_mode(self):
+    def make_train_mfcc_with_mode(self, **kwarg):
+        
+        if "filename" in kwarg.keys():
+            filename = kwarg["filename"]
 
         label, load_data = self.load_train_data()
         
@@ -53,10 +56,10 @@ class make_train_data:
         mfcc_data = np.asarray(mfcc_list)
         
         if self.train_mode == 1:
-            self.write_mfcc_feat('mfcc_feat_mode_1.npz', label, mfcc_data, sample_rate)
+            self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
             
         elif self.train_mode == 2:
-            self.write_mfcc_feat('mfcc_feat_mode_2.npz', label, mfcc_data, sample_rate)
+            self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
         
         return            
     
@@ -68,7 +71,10 @@ class make_train_data:
         return
     
     
-    def make_train_raw_sig_with_mode(self):
+    def make_train_raw_sig_with_mode(self, **kwarg):
+        
+        if "filename" in kwarg.keys():
+            filename = kwarg["filename"]
         
         label, load_data = self.load_train_data()
         
@@ -76,10 +82,10 @@ class make_train_data:
         data = load_data['data']
         
         if self.train_mode == 1:
-            self.write_raw_signal('raw_sig_mode_1.npz', label, data, sample_rate)
+            self.write_raw_signal(filename, label, data, sample_rate)
             
         elif self.train_mode == 2:
-            self.write_raw_signal('raw_sig_mode_2.npz', label, data, sample_rate)
+            self.write_raw_signal(filename, label, data, sample_rate)
         
         return
     
