@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import tensorflow as tf
 import numpy as np
 
 
@@ -12,3 +11,4 @@ print(a)
 b = np.reshape(a, (5, -1))
 
 print(b)
+print(b.shape)

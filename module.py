@@ -38,6 +38,11 @@ class save_the_best:
         self.max_metrics = 0.
         if os.path.isfile(self.filename):
             self.max_metrics = self.load_best_metrics()
+        else:
+            with open(self.filename, 'w', encoding='utf-8') as fw:
+                now = datetime.now()
+                fw.write(str(now)+'####')
+                fw.write(str(0.0)+'####accuracy')
         
     def load_best_metrics(self):
         with open(self.filename, 'r', encoding='utf-8') as fr:

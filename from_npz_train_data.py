@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 
+#%% explained
 """
-Created on Wed Aug 12 16:53:27 2020
-
-@author: jyback_pnc
+class : make train data
+methods :
+    1. write raw train data. e.g. mfcc files -> *.npz
+    2. make raw signal data
+    3. modification labels with mode
 """
 
+#%% declaration
 import numpy as np
 from python_speech_features import mfcc
 from python_speech_features import logfbank
 
 
+#%% 
 class make_train_data:
     
     def __init__(self, **kwarg):
@@ -29,7 +34,7 @@ class make_train_data:
         
         return
     
-    
+#%% write mfcc files    
     def write_mfcc_feat(self, filename, label, mfcc_data, sample_rate):
         fwb = open(filename, 'wb')
         np.savez_compressed(fwb, label=label, mfcc_data=mfcc_data, rate=sample_rate)
@@ -41,6 +46,8 @@ class make_train_data:
         
         if "filename" in kwarg.keys():
             filename = kwarg["filename"]
+        if "number_of_ceps" in kwarg.keys():
+            num_ceps = kwarg['number_of_ceps']
 
         label, load_data = self.load_train_data()
         
@@ -50,7 +57,7 @@ class make_train_data:
         mfcc_list = list()
         
         for sig, rate in zip(raw_signal, sample_rate):
-            mfcc_feat = mfcc(sig, rate)
+            mfcc_feat = mfcc(sig, rate, numcep=num_ceps)
             mfcc_list.append(mfcc_feat)
         
         mfcc_data = np.asarray(mfcc_list)
@@ -61,9 +68,13 @@ class make_train_data:
         elif self.train_mode == 2:
             self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
         
+        elif self.train_mode == 3:
+            self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
+        
         return            
     
-    
+
+#%% write raw signal files
     def write_raw_signal(self, filename, label, data, sample_rate):
         fwb = open(filename, 'wb')
         np.savez_compressed(fwb, label=label, data=data, rate=sample_rate)
@@ -89,11 +100,12 @@ class make_train_data:
         
         return
     
-    
+
+#%% modification labels 
     def make_train_mode_1(self, load_data): # wake up command
         a = load_data['label']
         for i,la in enumerate(a):
-            if la != 15:
+            if la != 16:
                 a[i] = 0
             else:
                 a[i] = 1        
@@ -104,23 +116,26 @@ class make_train_data:
     def make_train_mode_2(self, load_data): # normal command
         a = load_data['label']
         for i,la in enumerate(a):
-            if la == 15:
-                a[i] = 16
+            if la == 16:
+                a[i] = 15
         # print(a)        
         return a
     
-    
+
+#%% load train data on memory
     def load_train_data(self):
         load_data = np.load(self.npz_path, allow_pickle=True)
         if self.train_mode==1:
             mod_label = self.make_train_mode_1(load_data)
         elif self.train_mode==2:
             mod_label = self.make_train_mode_2(load_data)
+        else:
+            mod_label = load_data['label']
             
         return mod_label, load_data
                 
 
-
+#%% __main__
 if __name__=="__main__":
     print("hello, world~!!")
 

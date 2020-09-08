@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+#%% explained
+'''
+class : basic cnn block
+class : normal cnn model
+dense of softmax : optional
+'''
+
 
 #%% declaration
 from tensorflow.keras import layers
@@ -85,7 +92,14 @@ class norm_cnn(layers.Layer):
             self.ker_size = kwarg["kernel_size"]
                 
         
-    def __call__(self, inputs, num_class):
+    def __call__(self, inputs, **kwarg):
+        
+        if 'num_of_classes' in kwarg.keys():
+            num_class = kwarg['num_of_classes']        
+        if 'dense_softmax' in kwarg.keys():
+            softmax_bool = kwarg['dense_softmax']
+        else:
+            softmax_bool = False
         
         cnn_block_layer_init = cnn_block(activation=self.activation, 
                                           input_shape=self.input_shape_conv)
@@ -102,15 +116,17 @@ class norm_cnn(layers.Layer):
         
         x = cnn_block_layer(x, channel_size=512,
                             kernel_size=(3,3), pooling_bool=False,
-                            dropout_value=0.3)        
+                            dropout_value=0.25)        
         
-        x = layers.GlobalAveragePooling2D()(x)
-        
-        x = layers.Flatten()(x)
-        # x = layers.Dropout(0.2)(x)
-        x = layers.Dense(256, activation='linear')(x)
-        # x = layers.Dropout(0.3)(x)
-        output_val = layers.Dense(num_class, activation='softmax')(x)
+        if softmax_bool:
+            x = layers.GlobalAveragePooling2D()(x)
+            x = layers.Flatten()(x)
+            # x = layers.Dropout(0.2)(x)
+            x = layers.Dense(256, activation='linear')(x)
+            # x = layers.Dropout(0.3)(x)
+            output_val = layers.Dense(num_class, activation='softmax')(x)
+        else:
+            output_val = x
         
         return output_val
 

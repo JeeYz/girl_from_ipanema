@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 
+#%% explaining
+'''
+class : make files list and text file
+    methods :
+        1. make label dictionary
+        2. read wav files
+        3. making file process
+        4. write files list in text file
+        5. find files recursively
+'''
+
+
+
+#%% declaration
 import os
 from scipy.io import wavfile
 import numpy as np
@@ -40,6 +54,7 @@ class make_files_list_asr:
                 if line[0] not in none_list:
                     self.label_dict[line[0]] = label_num
                     label_num += 1 
+    
     
  
 #%% read wav file and make numpy binary file
@@ -91,6 +106,7 @@ class make_files_list_asr:
             np.savez_compressed(fwb, label=label_list, data=data_list, rate=sr_list)
                 
         return
+    
     
 #%% # this func is for making files list
     def make_file_process(self):     

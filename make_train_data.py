@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
 
+#%% explained
+'''
+class : load train data class
+    method : 
+        1. load train data from npz
+        2. This  making for padding data 'post'
+        3. option : 
+            1. We can decide 
+'''
+
+
+#%% declaration
 import tensorflow as tf
 import numpy as np
 from module import find_max_number_in_mfcc as find_max
@@ -12,7 +24,11 @@ class load_train_data_class:
         if 'npz_path' in kwarg.keys():
             self.npz_path = kwarg['npz_path']
                     
-    def load_train_data(self, *args):
+    def load_train_data(self, *args, **kwarg):
+        
+        if 'load_train_kind' in kwarg.keys():
+            load_dataset = kwarg['load_train_kind']
+        
         train_load_data = np.load(self.npz_path+self.files_list[args[0]], allow_pickle=True)
         test_load_data = np.load(self.npz_path+self.files_list[args[1]], allow_pickle=True)
         
@@ -31,15 +47,20 @@ class load_train_data_class:
         test_mfcc_feats = tf.keras.preprocessing.sequence.pad_sequences(test_mfcc_feats, 
                                                 maxlen=max_number, padding='post', dtype='float64')
         
-        train_mfcc_feats = tf.expand_dims(train_mfcc_feats, -1)
-        print("mfcc data shape : "+ str(train_mfcc_feats.shape))
+        if load_dataset == 'cnn':
+            train_mfcc_feats = tf.expand_dims(train_mfcc_feats, -1)
+            print("mfcc data shape : "+ str(train_mfcc_feats.shape))
+            test_mfcc_feats = tf.expand_dims(test_mfcc_feats, -1)
+            print("mfcc data shape : "+ str(test_mfcc_feats.shape))
+            
+            conv_shape = (train_mfcc_feats.shape[1], train_mfcc_feats.shape[2], 1)
+            
+            return train_mfcc_feats, test_mfcc_feats, train_labels, test_labels, conv_shape
         
-        test_mfcc_feats = tf.expand_dims(test_mfcc_feats, -1)
-        print("mfcc data shape : "+ str(test_mfcc_feats.shape))
-        
-        conv_shape = (train_mfcc_feats.shape[1], train_mfcc_feats.shape[2], 1)
-        
-        return train_mfcc_feats, test_mfcc_feats, train_labels, test_labels, conv_shape
+        elif load_dataset == 'rnn':
+            print("mfcc data shape : "+ str(train_mfcc_feats.shape))
+            input_shape = (train_mfcc_feats.shape[1], train_mfcc_feats.shape[2])
+            return train_mfcc_feats, test_mfcc_feats, train_labels, test_labels, input_shape
 
 
 #%% __main__
