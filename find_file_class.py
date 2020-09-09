@@ -39,9 +39,11 @@ class make_files_list_asr:
         self.train_files_list = []
         self.test_files_list = []
         self.label_dict = dict()
-        self.make_label_dict(temp)
+        # self.make_label_dict(temp)
+        self.make_dict_labels(temp)
         
-    
+
+#%% old version    
     def make_label_dict(self, t_path): # t_path is label file's path
         none_list = ['hibixbi', 'hiplus', 'okgoogle']
         label_num = 0
@@ -54,17 +56,30 @@ class make_files_list_asr:
                 if line[0] not in none_list:
                     self.label_dict[line[0]] = label_num
                     label_num += 1 
+                    
+#%% new version
+    def make_dict_labels(self, path):
+        self.label_dict=dict()
+        num = 1
+        with open(path, 'r', encoding='utf-8') as rf:
+            while True:
+                line = rf.readline()
+                line = line.split()
+                if not line: break
+                self.label_dict[line[0]]=num
+                num+=1
+            self.label_dict['hipnc2'] = 17
     
-    
- 
+     
 #%% read wav file and make numpy binary file
     def read_wav_file(self, **kwarg):
         
         if "numpy_data_filename" in kwarg.keys():
             result_binary = kwarg["numpy_data_filename"]
-        
         if "text_file_list" in kwarg.keys():
             text_filename = kwarg["text_file_list"]
+        if "mode_flag" in kwarg.keys():
+            mode_flag = kwarg['mode_flag']        
         
         temp = self.make_file_path +'\\'+ text_filename
         temp_1 = self.make_file_path +'\\'+ result_binary
@@ -77,28 +92,19 @@ class make_files_list_asr:
         open(temp_1, 'wb') as fwb:
             while True:
                 line = fr.readline()
-                line = line.split('\n')[0]
+                line = line.split()
                 if not line: break
-                # print(line)
-                fs, data = wavfile.read(line)
-                # print(fs)
-                # print(data)
-                tline = line.split('\\')
-                if tline[-2] in self.label_dict.keys():
-                    # print(self.label_dict[tline[-2]])
-                    a = np.array([self.label_dict[tline[-2]]])
-                elif tline[-2] == 'hipnc2':
-                    # print(self.label_dict['hipnc'])
-                    a = np.array([self.label_dict['hipnc']])
-                else:
-                    # print(self.label_dict['none'])
-                    a = np.array([self.label_dict['none']])
+
+                fs, data = wavfile.read(line[0])
+                
+                if mode_flag == 1:
+                    a = int(line[1])
+                elif mode_flag == 2:
+                    a = int(line[2])
                 
                 data_list.append(data)
                 label_list.append(a)
                 sr_list.append(fs)
-                # print(result)
-                # print(len(result))
                 
             data_list = np.asarray(data_list)
             label_list = np.asarray(label_list)
@@ -106,6 +112,68 @@ class make_files_list_asr:
             np.savez_compressed(fwb, label=label_list, data=data_list, rate=sr_list)
                 
         return
+    
+    
+#%% modify text file with adding lables
+    def modify_text_file_add_label(self):
+        file1 = 'train_text.txt'
+        file2 = 'test_text.txt'
+        file3 = 'train_text_labels.txt'
+        file4 = 'test_text_labels.txt'    
+        anti_keywords = ['hibixbi', 'hiplus', 'okgoogle']
+        keywords = ['hipnc', 'hipnc2']
+        label_file = 'label_list.txt'
+                    
+        label_dict = self.make_dict_labels(label_file)
+        
+        with open(file1, 'r', encoding='utf-8') as f1, open(file3, 'w', encoding='utf-8') as f2:
+            while True:
+                line = f1.readline()
+                if not line: break
+                line_t = line.split("\\")
+                line = line.split("\n")
+                
+                if line_t[0] != '':
+                    if line_t[-2] in keywords:
+                        mode_1_num = 1
+                    else:
+                        mode_1_num = 0
+                    
+                    if line_t[-2] in anti_keywords or line_t[-2] == 'none':
+                        mode_2_num = 0
+                    elif line_t[-2] in keywords:
+                        mode_2_num = 0
+                    else:
+                        mode_2_num = label_dict[line_t[-2]]
+                
+                new_line = line[0]+'\t\t'+str(mode_1_num)+'\t\t'+str(mode_2_num)+'\n'
+                f2.write(new_line)
+        
+        with open(file2, 'r', encoding='utf-8') as f1, open(file4, 'w', encoding='utf-8') as f2:
+            while True:
+                line = f1.readline()
+                if not line: break
+                line_t = line.split("\\")
+                line = line.split("\n")
+                
+                if line_t[0] != '':
+                    if line_t[-2] in keywords:
+                        mode_1_num = 1
+                    else:
+                        mode_1_num = 0
+                    
+                    if line_t[-2] in anti_keywords or line_t[-2] == 'none':
+                        mode_2_num = 0
+                    elif line_t[-2] in keywords:
+                        mode_2_num = 0
+                    else:
+                        mode_2_num = label_dict[line_t[-2]]
+                
+                new_line = line[0]+'\t\t'+str(mode_1_num)+'\t\t'+str(mode_2_num)+'\n'
+                f2.write(new_line)
+        
+        return
+
     
     
 #%% # this func is for making files list
