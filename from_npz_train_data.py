@@ -10,130 +10,114 @@ methods :
 """
 
 #%% declaration
+import sys
+sys.path.append("C:\\Users\\jyback_pnc\\Desktop\\code\\girl_from_ipanema")
+
 import numpy as np
 from python_speech_features import mfcc
 from python_speech_features import logfbank
+from preprocessing_for_data import new_minmax_normal
 
 
 #%% 
-class make_train_data:
+class make_train_feature:
     
     def __init__(self, **kwarg):
-        if "npz_path" in kwarg.keys():
-            self.npz_path = kwarg['npz_path']
-        if "train_mode" in kwarg.keys():
-            self.train_mode = kwarg["train_mode"]
+        if "return_path" in kwarg.keys():
+            self.return_path = kwarg['return_path']
 
 
-    def write_fb_feat(self):
+#%% normalization train data
+    def normalize_train_data(self, **kwarg):
+        if "origin_filename" in kwarg.keys():
+            origin_filename = kwarg["origin_filename"]
+        if "norm_filename" in kwarg.keys():
+            norm_filename = kwarg["norm_filename"]
+        
+        for ori_f, norm_f in zip(origin_filename, norm_filename):
+            ori_f = self.return_path+'\\'+ori_f
+            
+            loaded_data = np.load(ori_f, allow_pickle=True)
+            
+            label = loaded_data['label']
+            origin_data = loaded_data['data']
+            sample_rate = loaded_data['rate']
+            
+            mod_data = new_minmax_normal(origin_data)
+            
+            fwb = open(norm_f, 'wb')
+            np.savez_compressed(fwb, label=label, data=mod_data, rate=sample_rate)
+            fwb.close()
         
         return
 
 
-    def make_train_fb_with_mode(self, label, load_data):
+#%% write log filter bank data
+    def make_train_logfb(self, **kwarg):
+        
+        if "raw_filename" in kwarg.keys():
+            raw_filename = kwarg["raw_filename"]
+        if "logfb_filename" in kwarg.keys():
+            logfb_filename = kwarg["logfb_filename"]  
+        
+        for raw_f, logfb_f in zip(raw_filename, logfb_filename):
+            raw_f = self.return_path+'\\'+raw_f
+            
+            loaded_data = np.load(raw_f, allow_pickle=True)
+            
+            label = loaded_data['label']
+            raw_signal = loaded_data['data']
+            sample_rate = loaded_data['rate']
+            
+            logfb_list = list()
+            
+            for sig, rate in zip(raw_signal, sample_rate):
+                logfb_feat = logfbank(sig, rate)
+                logfb_list.append(logfb_feat)
+            
+            logfb_data = np.asarray(logfb_list)
+            
+            fwb = open(logfb_f, 'wb')
+            np.savez_compressed(fwb, label=label, data=logfb_data, rate=sample_rate)
+            fwb.close()
         
         return
+    
     
 #%% write mfcc files    
-    def write_mfcc_feat(self, filename, label, mfcc_data, sample_rate):
-        fwb = open(filename, 'wb')
-        np.savez_compressed(fwb, label=label, mfcc_data=mfcc_data, rate=sample_rate)
-        fwb.close()
-        return
-    
-    
-    def make_train_mfcc_with_mode(self, **kwarg):
+    def make_train_mfcc(self, **kwarg):
         
-        if "filename" in kwarg.keys():
-            filename = kwarg["filename"]
+        if "raw_filename" in kwarg.keys():
+            raw_filename = kwarg["raw_filename"]
+        if "mfcc_filename" in kwarg.keys():
+            mfcc_filename = kwarg["mfcc_filename"]
         if "number_of_ceps" in kwarg.keys():
             num_ceps = kwarg['number_of_ceps']
-
-        label, load_data = self.load_train_data()
         
-        raw_signal = load_data['data']
-        sample_rate = load_data['rate']
         
-        mfcc_list = list()
-        
-        for sig, rate in zip(raw_signal, sample_rate):
-            mfcc_feat = mfcc(sig, rate, numcep=num_ceps)
-            mfcc_list.append(mfcc_feat)
-        
-        mfcc_data = np.asarray(mfcc_list)
-        
-        if self.train_mode == 1:
-            self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
+        for raw_f, mfcc_f in zip(raw_filename, mfcc_filename):
+            raw_f = self.return_path+'\\'+raw_f
             
-        elif self.train_mode == 2:
-            self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
-        
-        elif self.train_mode == 3:
-            self.write_mfcc_feat(filename, label, mfcc_data, sample_rate)
+            loaded_data = np.load(raw_f, allow_pickle=True)
+            
+            label = loaded_data['label']
+            raw_signal = loaded_data['data']
+            sample_rate = loaded_data['rate']
+            
+            mfcc_list = list()
+            
+            for sig, rate in zip(raw_signal, sample_rate):
+                mfcc_feat = mfcc(sig, rate, numcep=num_ceps)
+                mfcc_list.append(mfcc_feat)
+            
+            mfcc_data = np.asarray(mfcc_list)
+            
+            fwb = open(mfcc_f, 'wb')
+            np.savez_compressed(fwb, label=label, data=mfcc_data, rate=sample_rate)
+            fwb.close()
         
         return            
-    
 
-#%% write raw signal files
-    def write_raw_signal(self, filename, label, data, sample_rate):
-        fwb = open(filename, 'wb')
-        np.savez_compressed(fwb, label=label, data=data, rate=sample_rate)
-        fwb.close()
-        return
-    
-    
-    def make_train_raw_sig_with_mode(self, **kwarg):
-        
-        if "filename" in kwarg.keys():
-            filename = kwarg["filename"]
-        
-        label, load_data = self.load_train_data()
-        
-        sample_rate = load_data['rate']
-        data = load_data['data']
-        
-        if self.train_mode == 1:
-            self.write_raw_signal(filename, label, data, sample_rate)
-            
-        elif self.train_mode == 2:
-            self.write_raw_signal(filename, label, data, sample_rate)
-        
-        return
-    
-
-#%% modification labels 
-    def make_train_mode_1(self, load_data): # wake up command
-        a = load_data['label']
-        for i,la in enumerate(a):
-            if la != 16:
-                a[i] = 0
-            else:
-                a[i] = 1        
-        # print(a)
-        return a
-    
-    
-    def make_train_mode_2(self, load_data): # normal command
-        a = load_data['label']
-        for i,la in enumerate(a):
-            if la == 16:
-                a[i] = 15
-        # print(a)        
-        return a
-    
-
-#%% load train data on memory
-    def load_train_data(self):
-        load_data = np.load(self.npz_path, allow_pickle=True)
-        if self.train_mode==1:
-            mod_label = self.make_train_mode_1(load_data)
-        elif self.train_mode==2:
-            mod_label = self.make_train_mode_2(load_data)
-        else:
-            mod_label = load_data['label']
-            
-        return mod_label, load_data
-                
 
 #%% __main__
 if __name__=="__main__":

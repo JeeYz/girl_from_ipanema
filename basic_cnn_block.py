@@ -74,7 +74,7 @@ class norm_cnn(layers.Layer):
         
         self.chan_list = []
         for i in range(self.num_of_blocks):
-            self.chan_size = self.chan_size*2
+            self.chan_size = self.chan_size+self.chan_size*i
             self.chan_list.append(self.chan_size)
         
         self.dropout_list = []
@@ -90,6 +90,8 @@ class norm_cnn(layers.Layer):
             self.pooling_bool = kwarg["pooling_bool"]
         if "kernel_size" in kwarg.keys():
             self.ker_size = kwarg["kernel_size"]
+        print('*********')
+        print(self.input_shape_conv)
                 
         
     def __call__(self, inputs, **kwarg):

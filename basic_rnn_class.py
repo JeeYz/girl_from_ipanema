@@ -105,19 +105,19 @@ class normal_rnn(layers.Layer):
                                    rnn_mode=self.mode_flag)
         x = init_rnn_layer(input_data)
         
-        if bn_bool:
-            x = layers.BatchNormalization()(x)        
+        # if bn_bool:
+        #     x = layers.BatchNormalization()(x)        
             
-        rnn_layer = rnn_block(num_of_cells=self.num_cells, 
-                              rnn_mode=self.mode_flag)
-        for l in range(self.num_layers-1):
-            x = rnn_layer(x)
-            if bn_bool:
-                x = layers.BatchNormalization()(x)
+        # rnn_layer = rnn_block(num_of_cells=self.num_cells, 
+        #                       rnn_mode=self.mode_flag)
+        # for l in range(self.num_layers-1):
+        #     x = rnn_layer(x)
+        #     if bn_bool:
+        #         x = layers.BatchNormalization()(x)
         
-        final_rnn_layer = rnn_block(num_of_cells=self.num_cells, 
-                              rnn_mode=fin_mode_flag)
-        x = final_rnn_layer(x)
+        # final_rnn_layer = rnn_block(num_of_cells=self.num_cells, 
+        #                       rnn_mode=fin_mode_flag)
+        # x = final_rnn_layer(x)
         
         x = layers.Dense(128, activation='relu')(x)
         x = layers.Dropout(0.2)(x)

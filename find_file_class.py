@@ -12,7 +12,6 @@ class : make files list and text file
 '''
 
 
-
 #%% declaration
 import os
 from scipy.io import wavfile
@@ -39,7 +38,6 @@ class make_files_list_asr:
         self.train_files_list = []
         self.test_files_list = []
         self.label_dict = dict()
-        # self.make_label_dict(temp)
         self.make_dict_labels(temp)
         
 
@@ -56,6 +54,7 @@ class make_files_list_asr:
                 if line[0] not in none_list:
                     self.label_dict[line[0]] = label_num
                     label_num += 1 
+                    
                     
 #%% new version
     def make_dict_labels(self, path):
