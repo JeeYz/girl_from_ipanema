@@ -59,7 +59,7 @@ class make_files_list_asr:
 #%% new version
     def make_dict_labels(self, path):
         self.label_dict=dict()
-        num = 1
+        num = 0
         with open(path, 'r', encoding='utf-8') as rf:
             while True:
                 line = rf.readline()
@@ -67,7 +67,7 @@ class make_files_list_asr:
                 if not line: break
                 self.label_dict[line[0]]=num
                 num+=1
-            self.label_dict['hipnc2'] = 17
+            self.label_dict['hipnc2'] = 20
     
      
 #%% read wav file and make numpy binary file

@@ -52,6 +52,11 @@ class residual_cnn_block(layers.Layer):
         x = layers.BatchNormalization()(x)
         x = tf.nn.relu(x)
         x = conv2d_layer_2(x)
+        
+        # additional layer
+        x = layers.BatchNormalization()(x)
+        x = tf.nn.relu(x)
+        
         print('*********', self.chan_size)
         y = layers.Conv2D(self.chan_size[1], (1, 1), padding='same')(init_val)
         z = layers.Conv2D(self.chan_size[1], (1, 1), padding='same')(init_inputs)
@@ -92,10 +97,10 @@ class residual_net(layers.Layer):
             self.output_type = kwarg['output_type'] 
 
         
-        self.residual_cnn_layer_1 = residual_cnn_block(channel_size=[8, 8], 
-                                                kernel_size=self.ker_size)
-        self.residual_cnn_layer_2 = residual_cnn_block(channel_size=[16, 16], 
-                                                kernel_size=self.ker_size)
+        # self.residual_cnn_layer_1 = residual_cnn_block(channel_size=[8, 8], 
+        #                                         kernel_size=self.ker_size)
+        # self.residual_cnn_layer_2 = residual_cnn_block(channel_size=[16, 16], 
+        #                                         kernel_size=self.ker_size)
         self.residual_cnn_layer_3 = residual_cnn_block(channel_size=[32, 32], 
                                                 kernel_size=self.ker_size)
         self.residual_cnn_layer_4 = residual_cnn_block(channel_size=[64, 64], 
@@ -104,7 +109,7 @@ class residual_net(layers.Layer):
                                                 kernel_size=self.ker_size)
         self.residual_cnn_layer_6 = residual_cnn_block(channel_size=[256, 256], 
                                                 kernel_size=self.ker_size)
-        # self.residual_cnn_layer_7 = residual_cnn_block(channel_size=self.chan_size, 
+        # self.residual_cnn_layer_7 = residual_cnn_block(channel_size=[512, 512], 
         #                                         kernel_size=self.ker_size)
         # self.residual_cnn_layer_8 = residual_cnn_block(channel_size=self.chan_size, 
         #                                         kernel_size=self.ker_size)
@@ -125,15 +130,15 @@ class residual_net(layers.Layer):
         
         init_input = inputs
         
-        x = self.residual_cnn_layer_1(init_input, inputs)
-        if self.pooling_bool:
-            x = self.pooling_layer(x)
-        x = self.residual_cnn_layer_2(init_input, x)
-        x = self.residual_cnn_layer_3(init_input, x)
+        # x = self.residual_cnn_layer_1(init_input, inputs)
+        # if self.pooling_bool:
+        #     x = self.pooling_layer(x)
+        # x = self.residual_cnn_layer_2(init_input, x)
+        x = self.residual_cnn_layer_3(init_input, inputs)
         x = self.residual_cnn_layer_4(init_input, x)
         x = self.residual_cnn_layer_5(init_input, x)
         x = self.residual_cnn_layer_6(init_input, x)
-        # x = self.residual_cnn_layer_7(init_inputs, x)
+        # x = self.residual_cnn_layer_7(init_input, x)
         # x = self.residual_cnn_layer_8(init_inputs, x)
         # x = self.residual_cnn_layer_9(init_inputs, x)
         

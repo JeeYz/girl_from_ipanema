@@ -60,6 +60,8 @@ class make_train_feature:
         if "logfb_filename" in kwarg.keys():
             logfb_filename = kwarg["logfb_filename"]  
         
+        
+        num = 0
         for raw_f, logfb_f in zip(raw_filename, logfb_filename):
             raw_f = self.return_path+'\\'+raw_f
             
@@ -74,6 +76,8 @@ class make_train_feature:
             for sig, rate in zip(raw_signal, sample_rate):
                 logfb_feat = logfbank(sig, rate)
                 logfb_list.append(logfb_feat)
+                num += 1
+                print(num)
             
             logfb_data = np.asarray(logfb_list)
             

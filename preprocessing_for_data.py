@@ -15,7 +15,7 @@ from sklearn import preprocessing
 def new_minmax_normal(input_data):
     temp = list()
     for one in input_data:
-        one = np.array(one, dtype='float64')
+        one = np.array(one, dtype='float32')
         res = (one - np.min(one))/(np.max(one) - np.min(one))
         # res = res*2 - 1.0
         temp.append(res)

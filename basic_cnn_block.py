@@ -74,7 +74,7 @@ class norm_cnn(layers.Layer):
         
         self.chan_list = []
         for i in range(self.num_of_blocks):
-            self.chan_size = self.chan_size+self.chan_size*i
+            self.chan_size = self.chan_size*2
             self.chan_list.append(self.chan_size)
         
         self.dropout_list = []
@@ -116,7 +116,7 @@ class norm_cnn(layers.Layer):
                                  kernel_size=self.ker_size, pooling_bool=self.pooling_bool,
                                  dropout_value=self.dropout_list[i+1])
         
-        x = cnn_block_layer(x, channel_size=512,
+        x = cnn_block_layer(x, channel_size=256,
                             kernel_size=(3,3), pooling_bool=False,
                             dropout_value=0.25)        
         

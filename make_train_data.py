@@ -46,9 +46,9 @@ class load_train_data_class:
         # max_number = 512
         
         train_feats = tf.keras.preprocessing.sequence.pad_sequences(train_feats, 
-                                                maxlen=max_number, padding='post', dtype='float64')
+                                                maxlen=max_number, padding='post', dtype='float32')
         test_feats = tf.keras.preprocessing.sequence.pad_sequences(test_feats, 
-                                                maxlen=max_number, padding='post', dtype='float64')
+                                                maxlen=max_number, padding='post', dtype='float32')
         
         if load_dataset == 'cnn':
             train_feats = tf.expand_dims(train_feats, -1)
@@ -63,13 +63,10 @@ class load_train_data_class:
         elif load_dataset == 'rnn':
             print("data shape : "+ str(train_feats.shape))
             input_shape = (train_feats.shape[1], train_feats.shape[2])
+            print('###', input_shape)
             return train_feats, test_feats, train_labels, test_labels, input_shape
         
         elif load_dataset == 'raw_signal':
-            train_feats = tf.keras.preprocessing.sequence.pad_sequences(train_feats, 
-                                                maxlen=max_num, padding='post', dtype='float64')
-            test_feats = tf.keras.preprocessing.sequence.pad_sequences(test_feats, 
-                                                maxlen=max_num, padding='post', dtype='float64')
             train_feats = tf.expand_dims(train_feats, -1)
             # train_feats = tf.expand_dims(train_feats, -1)
             print("data shape : "+ str(train_feats.shape))
