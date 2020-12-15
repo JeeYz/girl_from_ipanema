@@ -67,12 +67,20 @@ class load_train_data_class:
             return train_feats, test_feats, train_labels, test_labels, input_shape
         
         elif load_dataset == 'raw_signal':
+            # train_feats = tf.keras.preprocessing.sequence.pad_sequences(train_feats, 
+            #                                     maxlen=43*768, padding='post', dtype='float32')
+            # test_feats = tf.keras.preprocessing.sequence.pad_sequences(test_feats, 
+            #                                         maxlen=43*768, padding='post', dtype='float32')
             train_feats = tf.expand_dims(train_feats, -1)
             # train_feats = tf.expand_dims(train_feats, -1)
             print("data shape : "+ str(train_feats.shape))
             test_feats = tf.expand_dims(test_feats, -1)
             # test_feats = tf.expand_dims(test_feats, -1)
             print("data shape : "+ str(test_feats.shape))
+            
+            # train_feats = tf.reshape(train_feats, [-1, 43, 768])
+            # train_feats = train_feats.reshape(-1, 43, 768)
+            # test_feats = test_feats.reshape(-1, 43, 768)
             
             # conv_shape = (train_feats.shape[1], train_feats.shape[2], 1)
             conv_shape = (train_feats.shape[1], train_feats.shape[2])

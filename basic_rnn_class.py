@@ -84,7 +84,7 @@ class normal_rnn(layers.Layer):
         # result_numpy = np.reshape(input_tensor, (temp[0], temp[1], -1))
         # return result_numpy
         
-        print(input_tensor.shape)
+        print("+++++", input_tensor.shape)
         
         if self.defined_d == '2D':
             result_tensor = tf.reshape(input_tensor, [-1, input_tensor.shape[1], \
@@ -112,17 +112,30 @@ class normal_rnn(layers.Layer):
         print('****', input_data.shape)
         if self.num_layers > 1:
             rnn_layer_1 = rnn_block(num_of_cells=self.num_cells, 
-                                       rnn_mode='bigru_reseq')
+                                       rnn_mode='bilstm_reseq')
             rnn_layer_2 = rnn_block(num_of_cells=self.num_cells, 
-                                       rnn_mode=self.mode_flag)
+                                       rnn_mode='bilstm_reseq')
+            rnn_layer_3 = rnn_block(num_of_cells=self.num_cells, 
+                                       rnn_mode='bilstm_reseq')
+            rnn_layer_4 = rnn_block(num_of_cells=self.num_cells, 
+                                       rnn_mode='bilstm_reseq')
+            rnn_layer_5 = rnn_block(num_of_cells=self.num_cells, 
+                                       rnn_mode='bilstm_reseq')
+            rnn_layer_6 = rnn_block(num_of_cells=self.num_cells, 
+                                       rnn_mode='bilstm')
             x = rnn_layer_1(input_data)
-            x = rnn_layer_2(x)
+            x = layers.Dropout(0.2)(x)
+            # x = rnn_layer_2(x)
+            # x = rnn_layer_3(x)
+            # x = rnn_layer_4(x)
+            # x = rnn_layer_5(x)
+            x = rnn_layer_6(x)
         else:
             init_rnn_layer = rnn_block(num_of_cells=self.num_cells, 
                                        rnn_mode=self.mode_flag)
             x = init_rnn_layer(input_data)
         
-        
+        # x = layers.Flatten()(x)
         x = layers.Dropout(0.2)(x)
         
         answer = layers.Dense(num_classes, activation='softmax')(x)

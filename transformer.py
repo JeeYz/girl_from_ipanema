@@ -24,7 +24,7 @@ def positional_encoding(position, d_model):
     
     # apply cos to odd indices in the array; 2i+1
     angle_rads[:, 1::2] = np.cos(angle_rads[:, 1::2])
-      
+    
     pos_encoding = angle_rads[np.newaxis, ...]
       
     return tf.cast(pos_encoding, dtype=tf.float32)
@@ -129,9 +129,38 @@ def point_wise_feed_forward_network(d_model, dff):
 
 
 #%%
-class EncoderLayer(tf.keras.layers.Layer):
+class EncoderLayer_no_ffn(tf.keras.layers.Layer):
     def __init__(self, d_model, num_heads, dff, rate=0.1):
-        super(EncoderLayer, self).__init__()
+        super(EncoderLayer_no_ffn, self).__init__()
+      
+        self.mha = MultiHeadAttention(d_model, num_heads)
+        # self.ffn = point_wise_feed_forward_network(d_model, dff)
+      
+        self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
+        
+        self.dropout1 = tf.keras.layers.Dropout(rate)
+        self.dropout2 = tf.keras.layers.Dropout(rate)
+        
+    def get_config(self):
+     	config = super().get_config().copy()
+     	return config
+      
+    def call(self, x, training, mask):
+        x = self.layernorm1(x)
+        attn_output, _ = self.mha(x, x, x, mask)  # (batch_size, input_seq_len, d_model)
+        attn_output = self.dropout1(attn_output, training=training)
+        out1 = self.layernorm1(x + attn_output)  # (batch_size, inpu1t_seq_len, d_model)
+        # out1 = self.layernorm1(x)  # (batch_size, input_seq_len, d_model)
+        # out1 = tf.math.add(x, attn_output)
+      
+        return out1
+
+
+#%%
+class EncoderLayer_with_ffn(tf.keras.layers.Layer):
+    def __init__(self, d_model, num_heads, dff, rate=0.1):
+        super(EncoderLayer_with_ffn, self).__init__()
       
         self.mha = MultiHeadAttention(d_model, num_heads)
         self.ffn = point_wise_feed_forward_network(d_model, dff)
@@ -141,16 +170,27 @@ class EncoderLayer(tf.keras.layers.Layer):
         
         self.dropout1 = tf.keras.layers.Dropout(rate)
         self.dropout2 = tf.keras.layers.Dropout(rate)
+        
+    def get_config(self):
+     	config = super().get_config().copy()
+     	return config
       
     def call(self, x, training, mask):
     
+        x = self.layernorm1(x)  # (batch_size, input_seq_len, d_model)
         attn_output, _ = self.mha(x, x, x, mask)  # (batch_size, input_seq_len, d_model)
         attn_output = self.dropout1(attn_output, training=training)
+        # post normalization vs pre normalization
         out1 = self.layernorm1(x + attn_output)  # (batch_size, input_seq_len, d_model)
+        # out1 = self.layernorm1(x)  # (batch_size, input_seq_len, d_model)
+        # out1 = tf.math.add(x, attn_output)
         
+        # out1 = self.layernorm1(out1)  # (batch_size, input_seq_len, d_model)
         ffn_output = self.ffn(out1)  # (batch_size, input_seq_len, d_model)
         ffn_output = self.dropout2(ffn_output, training=training)
         out2 = self.layernorm2(out1 + ffn_output)  # (batch_size, input_seq_len, d_model)
+        # out2 = self.layernorm1(out1)  # (batch_size, input_seq_len, d_model)
+        # out2 = tf.math.add(out1, ffn_output)
         
         return out2
 
@@ -163,7 +203,7 @@ class DecoderLayer(tf.keras.layers.Layer):
         self.mha1 = MultiHeadAttention(d_model, num_heads)
         self.mha2 = MultiHeadAttention(d_model, num_heads)
       
-        self.ffn = point_wise_feed_forward_network(d_model, dff)
+        # self.ffn = point_wise_feed_forward_network(d_model, dff)
        
         self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
         self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
@@ -208,7 +248,7 @@ class Encoder(tf.keras.layers.Layer):
                                                 self.d_model)
         
         
-        self.enc_layers = [EncoderLayer(d_model, num_heads, dff, rate) 
+        self.enc_layers = [EncoderLayer_with_ffn(d_model, num_heads, dff, rate) 
                            for _ in range(num_layers)]
       
         self.dropout = tf.keras.layers.Dropout(rate)

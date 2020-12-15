@@ -44,6 +44,8 @@ class result_graph:
         
         ax.set_title('Result Graph')
         
+        plt.ylim(0.0, 1.0)
+        
         plt.tight_layout()
         plt.show()
         
