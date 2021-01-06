@@ -20,12 +20,15 @@ import draw_multi_graphs
 
 from util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 import signal_trigger
+import find_wav_files
 
 trigger_val = 0.5
 
 
 ##
-def cut_signal_data():
+def modifying_train_data():
+
+
 
     return
 

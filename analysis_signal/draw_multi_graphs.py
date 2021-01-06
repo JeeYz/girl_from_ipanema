@@ -8,9 +8,9 @@ from scipy.io import wavfile
 
 from python_speech_features import mfcc
 from python_speech_features import logfbank
-import draw_single_graph
-from util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
+from . import draw_single_graph
+from .util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
 titles_list = []
 xlabels_list = []
@@ -50,6 +50,7 @@ def compare_data(*args, **kwargs):
         plt.xlabel(temp[2])
         plt.ylabel(temp[3])
         # plt.tight_layout()
+        plt.colorbar()
 
     ## draw normalized feature vector graph
     plt.figure()
@@ -66,6 +67,7 @@ def compare_data(*args, **kwargs):
         plt.xlabel(temp[2])
         plt.ylabel(temp[3])
         # plt.tight_layout()
+        plt.colorbar()
 
 
     return
@@ -92,6 +94,7 @@ def draw_multiple_graph_with_one_data(data, sr, **kwargs):
     plt.title('Feature Vector')
     plt.xlabel('frame sequence')
     plt.ylabel('number of filters')
+    plt.colorbar()
 
     data = draw_single_graph.new_minmax_normal([data])
     data = data[0]
@@ -100,6 +103,7 @@ def draw_multiple_graph_with_one_data(data, sr, **kwargs):
     plt.title('Normalized Feature Vector')
     plt.xlabel('frame sequence')
     plt.ylabel('number of filters')
+    plt.colorbar()
 
     return
 

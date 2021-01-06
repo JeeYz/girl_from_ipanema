@@ -1,6 +1,5 @@
 import sys
 sys.path.append('D:\\')
-sys.path.append('..\\')
 
 from scipy import signal
 from scipy.fft import fft, fftshift
@@ -14,14 +13,11 @@ from sklearn import preprocessing
 
 from python_speech_features import logfbank
 from files_locations import example_filename
-from draw_single_graph import draw_graph_logfbank, draw_graph_logfbank_norm, draw_graph_raw_signal
-import draw_single_graph
-import draw_multi_graphs
+from . import draw_single_graph
+from . import draw_multi_graphs
+from .draw_single_graph import draw_graph_logfbank, draw_graph_logfbank_norm, draw_graph_raw_signal
 
-from util_module import standardization_func, new_minmax_normal, transpose_the_matrix
-
-trigger_val = 0.5
-
+from .util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
 def evaluate_mean_of_frame(data, **kwargs):
 
@@ -31,6 +27,12 @@ def evaluate_mean_of_frame(data, **kwargs):
         shift_time = kwargs['shift_time']
     if "sample_rate" in kwargs.keys():
         sr = kwargs['sample_rate']
+    if "buffer_size" in kwargs.keys():
+        buf_size = kwargs['buffer_size']
+    if "full_size" in kwargs.keys():
+        full_size = kwargs['full_size']
+    if "threshold_value" in kwargs.keys():
+        trigger_val = kwargs['threshold_value']
 
     frame_size = int(sr*frame_time)
     shift_size = int(sr*shift_time)
@@ -57,4 +59,46 @@ def evaluate_mean_of_frame(data, **kwargs):
             end_index = len(mean_val_list)-i
             break
 
-    return data[(frame_size-shift_size)*start_index:(frame_size-shift_size)*end_index]
+    temp = (frame_size-shift_size)*start_index-buf_size
+    if temp <= 0:
+        temp = 0
+
+    result = data[temp:(frame_size-shift_size)*end_index+buf_size]
+
+    if full_size > len(result):
+        result = fit_determined_size(result, full_size=full_size)
+        result = add_noise_data(result, full_size=full_size)
+
+    return result
+
+
+##
+def fit_determined_size(data, **kwargs):
+    if "full_size" in kwargs.keys():
+        full_size = kwargs['full_size']
+    result = np.append(data, np.zeros(full_size-len(data)))
+
+    return result
+
+
+##
+def add_noise_data(data, **kwargs):
+    if "full_size" in kwargs.keys():
+        full_size = kwargs['full_size']
+
+    noise_data = np.random.randn(full_size)*0.01
+    result = data+noise_data
+
+    return result
+
+
+
+
+
+
+
+
+
+
+
+## endl

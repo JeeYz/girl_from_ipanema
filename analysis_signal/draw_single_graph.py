@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from python_speech_features import mfcc
 from python_speech_features import logfbank
-from util_module import standardization_func, new_minmax_normal, transpose_the_matrix
+from .util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
 
 
@@ -56,6 +56,7 @@ def draw_graph_logfbank(data, sr, **kwargs):
     plt.title(title_name)
 
     plt.tight_layout()
+    plt.colorbar()
     # plt.show()
 
     return
@@ -82,7 +83,7 @@ def draw_graph_logfbank_norm(data, sr, **kwargs):
     plt.xlabel('frame sequence')
     plt.ylabel('number of filters')
     plt.title(title_name)
-
+    plt.colorbar()
     plt.tight_layout()
 
     return
