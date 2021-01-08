@@ -43,7 +43,7 @@ def draw_graph_logfbank(data, sr, **kwargs):
     if "title_name" in kwargs.keys():
         title_name = kwargs['title_name']
 
-    data = logfbank(data, sr)
+    # data = logfbank(data, sr)
     data = transpose_the_matrix(data)
 
     plt.figure()

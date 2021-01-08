@@ -10,6 +10,8 @@ import time
 from scipy.io import wavfile
 from check_files import createFolder, make_data_list
 
+from sklearn.preprocessing import Normalizer
+
 temp = __file__.split('\\')
 temp = '\\'.join(temp[:-2])
 sys.path.append(temp)
@@ -25,6 +27,9 @@ mod_test_files_name = 'D:\\mod_test_data_files.txt'
 
 mod_full_data_files_name = 'D:\\mod_full_data_files_list.txt'
 
+mod_train_data_path = 'D:\\ASR_train_data_mod\\mod_train_data.npz'
+mod_test_data_path = 'D:\\ASR_train_data_mod\\mod_test_data.npz'
+
 sample_rate = 16000
 recording_time = 2
 frame_t = 0.025
@@ -35,15 +40,37 @@ buffer_s = 3000
 ##
 def main():
     # full_data_list = make_data_list()
-    # wav_to_data(full_data_list)
+    # wav_to_reduced_data(full_data_list)
 
+    # generate_train_data(mod_full_data_files_name)
 
+    load_train_data = np.load(mod_train_data_path, allow_pickle=True)
+    # print(load_train_data['label'])
+    # print(len(load_train_data['label']))
+    load_test_data = np.load(mod_test_data_path, allow_pickle=True)
+    # print(load_test_data['label'])
+    # print(len(load_test_data['label']))
+
+    # print(load_train_data['data'])
+
+    # for one in load_train_data['data']:
+    #     # if len(one) != 199:
+    #     #     print(len(one))
+    #     print(one)
+
+    temp = load_train_data['data'][1000]
+    print(len(temp[0]))
+    print(len(temp))
+    # print(temp)
+    # print(temp[0])
+    draw_single_graph.draw_graph_logfbank(temp, sample_rate, title_name='log fb')
+    plt.show()
 
     return
 
 
 ##
-def wav_to_data(data_list):
+def wav_to_reduced_data(data_list):
 
     for one in data_list:
         one_name = one['file_name']
@@ -87,15 +114,53 @@ def wav_to_data(data_list):
 
 
 ##
-def generate_train_data():
+def generate_train_data(text_filepath):
 
+    fwb_train = open(mod_train_data_path, 'wb')
+    fwb_test = open(mod_test_data_path, 'wb')
+    train_data_list = list()
+    test_data_list = list()
+
+    train_label_list = list()
+    test_label_list = list()
+
+    with open(text_filepath, 'r', encoding='utf-8') as fr:
+        while True:
+            line = fr.readline()
+            line = line.split()
+            if not line: break
+
+            samplerate, data = wavfile.read(line[0])
+            # print(data)
+            # print(len(data))
+            logfb_feat = logfbank(data)
+            # print(len(logfb_feat))
+            # print(logfb_feat)
+
+            # transformer = Normalizer().fit(logfb_feat)
+            # logfb_feat = transformer.transform(logfb_feat)
+
+            logfb_feat = util_module.standardization_func(logfb_feat)
+
+            temp_path = line[0].split('\\\\')
+
+            if temp_path[2] == 'test':
+                test_data_list.append(logfb_feat)
+                test_label_list.append(int(line[-1]))
+            elif temp_path[2] == 'train':
+                train_data_list.append(logfb_feat)
+                train_label_list.append(int(line[-1]))
+
+    train_data = np.asarray(train_data_list)
+    test_data = np.asarray(test_data_list)
+
+    train_label = np.asarray(train_label_list)
+    test_label = np.asarray(test_label_list)
+
+    np.savez_compressed(fwb_train, label=train_label, data=train_data, rate=samplerate)
+    np.savez_compressed(fwb_test, label=test_label, data=test_data, rate=samplerate)
 
     return
-
-
-
-
-
 
 
 
@@ -112,3 +177,23 @@ def generate_train_data():
 ## endl
 if __name__ == '__main__':
     main()
+    #
+    # with open(mod_full_data_files_name, 'r', encoding='utf-8') as fr:
+    #     line = fr.readline()
+    #     line = line.split()
+    #
+    #     samplerate, data = wavfile.read(line[0])
+    #     print(data)
+    #     print(len(data))
+    #     draw_single_graph.draw_graph_raw_signal(data, title_name='raw')
+    #
+    #     logfb_feat = logfbank(data)
+    #     print(len(logfb_feat))
+    #     print(logfb_feat)
+    #     draw_single_graph.draw_graph_logfbank(logfb_feat, sample_rate, title_name='logfb')
+    #
+    #     logfb_feat = util_module.standardization_func(logfb_feat)
+    #
+    #     draw_single_graph.draw_graph_logfbank(logfb_feat, sample_rate, title_name='std. logfb')
+    #
+    #     plt.show()

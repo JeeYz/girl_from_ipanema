@@ -59,7 +59,7 @@ class make_train_feature:
             raw_filename = kwarg["raw_filename"]
         if "logfb_filename" in kwarg.keys():
             logfb_filename = kwarg["logfb_filename"]
-                
+
         num = 0
         for raw_f, logfb_f in zip(raw_filename, logfb_filename):
             raw_f = self.return_path+'\\'+raw_f
@@ -120,6 +120,18 @@ class make_train_feature:
             fwb.close()
 
         return
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #%% __main__
