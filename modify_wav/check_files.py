@@ -128,7 +128,8 @@ if __name__ == '__main__':
                                             shift_time=shift_t,
                                             sample_rate=sample_rate,
                                             buffer_size=buffer_s,
-                                            full_size = sample_rate*recording_time)
+                                            full_size = sample_rate*recording_time,
+                                            threshold_value=0.5)
     draw_single_graph.draw_graph_raw_signal(mod_data, title_name = 'modified raw signal')
     plt.show()
 

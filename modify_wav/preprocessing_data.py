@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 
 from scipy import signal
 from scipy.fft import fft, fftshift
@@ -26,9 +27,10 @@ mod_train_files_name = 'D:\\mod_train_data_files.txt'
 mod_test_files_name = 'D:\\mod_test_data_files.txt'
 
 mod_full_data_files_name = 'D:\\mod_full_data_files_list.txt'
+mod_full_data_files_name_shuffle = 'D:\\mod_full_data_files_list_shuffle.txt'
 
-mod_train_data_path = 'D:\\ASR_train_data_mod\\mod_train_data.npz'
-mod_test_data_path = 'D:\\ASR_train_data_mod\\mod_test_data.npz'
+mod_train_data_path = 'D:\\mod_train_data.npz'
+mod_test_data_path = 'D:\\mod_test_data.npz'
 
 sample_rate = 16000
 recording_time = 2
@@ -42,7 +44,7 @@ def main():
     # full_data_list = make_data_list()
     # wav_to_reduced_data(full_data_list)
 
-    # generate_train_data(mod_full_data_files_name)
+    generate_train_data(mod_full_data_files_name)
 
     load_train_data = np.load(mod_train_data_path, allow_pickle=True)
     # print(load_train_data['label'])
@@ -118,11 +120,16 @@ def generate_train_data(text_filepath):
 
     fwb_train = open(mod_train_data_path, 'wb')
     fwb_test = open(mod_test_data_path, 'wb')
+    fwb_val = open(mod_test_data_path, 'wb')
     train_data_list = list()
     test_data_list = list()
+    val_data_list = list()
 
     train_label_list = list()
     test_label_list = list()
+    val_label_list = list()
+
+    val_rate = 0.1
 
     with open(text_filepath, 'r', encoding='utf-8') as fr:
         while True:
@@ -148,13 +155,25 @@ def generate_train_data(text_filepath):
                 test_data_list.append(logfb_feat)
                 test_label_list.append(int(line[-1]))
             elif temp_path[2] == 'train':
-                train_data_list.append(logfb_feat)
-                train_label_list.append(int(line[-1]))
+                one_train = list()
+                one_train.append(logfb_feat)
+                one_train.append(int(line[-1]))
+                train_data_list.append(one_train)
 
-    train_data = np.asarray(train_data_list)
+    random.shuffle(train_data_list)
+
+    temp_train_data = list()
+    temp_train_label = list()
+
+    for one in train_data_list:
+        # print(one)
+        temp_train_data.append(one[0])
+        temp_train_label.append(one[1])
+
+    train_data = np.asarray(temp_train_data)
+    train_label = np.asarray(temp_train_label)
+
     test_data = np.asarray(test_data_list)
-
-    train_label = np.asarray(train_label_list)
     test_label = np.asarray(test_label_list)
 
     np.savez_compressed(fwb_train, label=train_label, data=train_data, rate=samplerate)
@@ -177,7 +196,7 @@ def generate_train_data(text_filepath):
 ## endl
 if __name__ == '__main__':
     main()
-    #
+
     # with open(mod_full_data_files_name, 'r', encoding='utf-8') as fr:
     #     line = fr.readline()
     #     line = line.split()
@@ -185,15 +204,15 @@ if __name__ == '__main__':
     #     samplerate, data = wavfile.read(line[0])
     #     print(data)
     #     print(len(data))
-    #     draw_single_graph.draw_graph_raw_signal(data, title_name='raw')
+    #     draw_single_graph.draw_graph_raw_signal(data, title_name='raw data')
     #
     #     logfb_feat = logfbank(data)
     #     print(len(logfb_feat))
     #     print(logfb_feat)
-    #     draw_single_graph.draw_graph_logfbank(logfb_feat, sample_rate, title_name='logfb')
+    #     draw_single_graph.draw_graph_logfbank(logfb_feat, sample_rate, title_name='logfb feature')
     #
     #     logfb_feat = util_module.standardization_func(logfb_feat)
     #
-    #     draw_single_graph.draw_graph_logfbank(logfb_feat, sample_rate, title_name='std. logfb')
+    #     draw_single_graph.draw_graph_logfbank(logfb_feat, sample_rate, title_name='stdardized logfb')
     #
     #     plt.show()
