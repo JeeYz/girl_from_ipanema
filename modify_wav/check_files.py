@@ -104,34 +104,23 @@ def make_data_list():
     return full_data_list
 
 
-full_data_list = make_data_list()
+# full_data_list = make_data_list()
 # print(full_data_list)
 
 
 ##
 if __name__ == '__main__':
-    sample_rate = 16000
-    recording_time = 2
-    frame_t = 0.025
-    shift_t = 0.01
-    buffer_s = 3000
+    aug_train_data_path = 'D:\\aug_train_data.npz'
+    aug_test_data_path = 'D:\\aug_test_data.npz'
 
-    samplerate, data = wavfile.read(full_data_list[0]['file_name'])
-    print(samplerate)
-    print(data)
-    print(len(data))
-    draw_single_graph.draw_graph_raw_signal(data, title_name = 'raw signal')
-    # plt.show()
+    train_load_data = np.load(aug_train_data_path)
+    train_data = train_load_data['data']
+    print(len(train_load_data['data']))
+    print(len(train_load_data['label']))
 
-    data = util_module.standardization_func(data)
-    mod_data = signal_trigger.evaluate_mean_of_frame(data, frame_time=frame_t,
-                                            shift_time=shift_t,
-                                            sample_rate=sample_rate,
-                                            buffer_size=buffer_s,
-                                            full_size = sample_rate*recording_time,
-                                            threshold_value=0.5)
-    draw_single_graph.draw_graph_raw_signal(mod_data, title_name = 'modified raw signal')
-    plt.show()
+    for one in train_data:
+        if len(one) != 199:
+            print(len(one))
 
 
 

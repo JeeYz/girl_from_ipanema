@@ -5,7 +5,6 @@ def standardization_func(data):
     return (data-np.mean(data))/np.std(data)
 
 
-
 #%% new min max normal
 def new_minmax_normal(input_data):
     temp = list()

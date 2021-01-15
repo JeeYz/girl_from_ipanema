@@ -32,6 +32,8 @@ mod_full_data_files_name_shuffle = 'D:\\mod_full_data_files_list_shuffle.txt'
 mod_train_data_path = 'D:\\mod_train_data.npz'
 mod_test_data_path = 'D:\\mod_test_data.npz'
 
+
+
 sample_rate = 16000
 recording_time = 2
 frame_t = 0.025
@@ -120,16 +122,12 @@ def generate_train_data(text_filepath):
 
     fwb_train = open(mod_train_data_path, 'wb')
     fwb_test = open(mod_test_data_path, 'wb')
-    fwb_val = open(mod_test_data_path, 'wb')
+
     train_data_list = list()
     test_data_list = list()
-    val_data_list = list()
 
     train_label_list = list()
     test_label_list = list()
-    val_label_list = list()
-
-    val_rate = 0.1
 
     with open(text_filepath, 'r', encoding='utf-8') as fr:
         while True:

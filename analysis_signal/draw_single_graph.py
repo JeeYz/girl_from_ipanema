@@ -98,6 +98,4 @@ def draw_graph_logfbank_norm(data, sr, **kwargs):
 
 
 
-
-
-##
+## endl

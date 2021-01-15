@@ -37,7 +37,7 @@ class residual_cnn_block_2D(layers.Layer):
         x = tf.nn.relu(x)
         x = conv2d_layer_2(x)
         # x = layers.BatchNormalization()(x)
-        print('*********', self.chan_size)
+        # print('*********', self.chan_size)
         y = layers.Conv2D(self.chan_size[1], (1, 1), padding='same')(init_val)
         x = tf.math.add(y, x)
         x = tf.nn.relu(x)
@@ -140,12 +140,28 @@ class residual_net_2D(layers.Layer):
         return output_val
 
 
-## only for cnn type input
-max_number = 200
-def load_train_data(*args, **kwarg):
 
-    train_load_data = np.load('D:\\mod_train_data.npz', allow_pickle=True)
-    test_load_data = np.load('D:\\mod_test_data.npz', allow_pickle=True)
+
+## only for cnn type input
+def load_train_data(*args, **kwarg):
+    max_number = 200
+
+
+    # train_data_path = 'D:\\mod_train_data.npz'
+    # test_data_path = 'D:\\mod_test_data.npz'
+
+    # train_data_path = 'D:\\aug_train_data.npz'
+    # train_data_path = 'D:\\train_data_for_all.npz'
+    # test_data_path = 'D:\\aug_test_data.npz'
+
+    # train_data_path = 'D:\\aug_norm_train_data.npz'
+    # test_data_path = 'D:\\aug_norm_test_data.npz'
+
+    train_data_path = 'D:\\train_data_sampling_one.npz'
+    test_data_path = 'D:\\test_data_sampling_one.npz'
+
+    train_load_data = np.load(train_data_path, allow_pickle=True)
+    test_load_data = np.load(test_data_path, allow_pickle=True)
 
     train_labels = train_load_data['label']
     train_feats = train_load_data['data']
@@ -170,62 +186,74 @@ def load_train_data(*args, **kwarg):
     return train_feats, test_feats, train_labels, test_labels, conv_shape
 
 
-num_batch = 64
-epoch_num = 100
-num_label = 17
 
-load_mode = 0
+if __name__ == '__main__':
 
+    num_batch = 64
+    epoch_num = 30
+    num_label = 17
 
-#%% loading data
-train_mfcc_feats, test_mfcc_feats, train_labels, test_labels,conv_shape=load_train_data()
-
-
-#%% build model
-input_vec = tf.keras.Input(shape=conv_shape)
-
-resnet = residual_net_2D()
-
-answer = resnet(input_vec, num_of_classes=num_label)
-
-model = tf.keras.Model(inputs=input_vec, outputs=answer)
-
-model.summary()
-
-model.compile(optimizer=keras.optimizers.Adam(),
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+    load_mode = 0
 
 
-#%% epoch training loop
-max_acc = 0.0
-graph_cl = rg()
-
-#%% old train // test per one epoch
-for i,epo in enumerate(range(epoch_num)):
-    print("\n\n%d th epoch\n"%(epo+1))
-
-    if load_mode == 1:
-        model.load_weights('resnet_model.h5')
-
-    history = model.fit(train_mfcc_feats, train_labels,
-                            batch_size=num_batch, epochs=1, verbose=1)
-
-    loss, metric_res = model.evaluate(x=test_mfcc_feats,
-            y=test_labels, verbose=1)   # "return_dict" argument doesn't work in tf 2.1
-                                        # but, after 2.2, it workss
-
-    model.save('resnet_model.h5')
-    if metric_res > max_acc:
-        max_acc = metric_res
-        model.save('resnet_model_best.h5')
-        print("recent max acc value : ", max_acc)
-
-    graph_cl.make_list(train_result=history, eval_loss=loss, eval_acc=metric_res)
+    #%% loading data
+    train_mfcc_feats, test_mfcc_feats, train_labels, test_labels,conv_shape=load_train_data()
 
 
-graph_cl.draw_plt_graph()
-print("\nhighest accuracy in this model only : ", max_acc, '\n\n\n')
+    #%% build model
+    input_vec = tf.keras.Input(shape=conv_shape)
+
+    resnet = residual_net_2D()
+
+    answer = resnet(input_vec, num_of_classes=num_label)
+
+    model = tf.keras.Model(inputs=input_vec, outputs=answer)
+
+    model.summary()
+
+    model.compile(optimizer=keras.optimizers.Adam(),
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+
+
+    #%% epoch training loop
+    max_acc = 0.0
+    graph_cl = rg()
+
+    h5_path_0 = 'D:\\resnet_model_only_train.h5'
+    h5_path_best_0 = 'D:\\resnet_model_best_only_train.h5'
+
+    h5_path_1 = 'D:\\resnet_model_all.h5'
+    h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
+
+
+    #%% old train // test per one epoch
+    for i,epo in enumerate(range(epoch_num)):
+        print("\n\n%d th epoch\n"%(epo+1))
+
+        if load_mode == 1:
+            model.load_weights('D:\\resnet_model.h5')
+
+        history = model.fit(train_mfcc_feats, train_labels,
+                                batch_size=num_batch, epochs=1, verbose=1,
+                                validation_split=0.1, shuffle=True)
+
+        loss, metric_res = model.evaluate(x=test_mfcc_feats,
+                y=test_labels, verbose=1)   # "return_dict" argument doesn't work in tf 2.1
+                                            # but, after 2.2, it workss
+        # print(history.history['val_accuracy'])
+        temp = metric_res+history.history['val_accuracy'][0]
+        model.save('D:\\resnet_model.h5')
+        if temp > max_acc:
+            max_acc = temp
+            model.save('D:\\resnet_model_best.h5')
+            print("recent max acc value : ", max_acc)
+
+        graph_cl.make_list(train_result=history, eval_loss=loss, eval_acc=metric_res)
+
+
+    graph_cl.draw_plt_graph()
+    print("\nhighest accuracy in this model only : ", max_acc, '\n\n\n')
 
 
 

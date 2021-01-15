@@ -53,11 +53,15 @@ def evaluate_mean_of_frame(data, **kwargs):
         if trigger_val < start:
             start_index = i
             break
+        else:
+            start_index = 0
 
     for i,end in enumerate(reversed(mean_val_list)):
         if trigger_val < end:
             end_index = len(mean_val_list)-i
             break
+        else:
+            end_index = len(mean_val_list)
 
     temp = (frame_size-shift_size)*start_index-buf_size
     if temp <= 0:

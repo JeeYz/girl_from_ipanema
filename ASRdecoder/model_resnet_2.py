@@ -130,6 +130,7 @@ class residual_net_2D(layers.Layer):
         # x = self.residual_cnn_layer_6_1(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
+        x = self.residual_cnn_layer_7_0(x)
 
         x = layers.GlobalAveragePooling2D()(x)
         x = layers.Flatten()(x)
@@ -142,10 +143,20 @@ class residual_net_2D(layers.Layer):
 
 ## only for cnn type input
 max_number = 200
+
+# train_data_path = 'D:\\mod_train_data.npz'
+# test_data_path = 'D:\\mod_test_data.npz'
+
+train_data_path = 'D:\\aug_train_data.npz'
+test_data_path = 'D:\\aug_test_data.npz'
+
+# train_data_path = 'D:\\aug_norm_train_data.npz'
+# test_data_path = 'D:\\aug_norm_test_data.npz'
+
 def load_train_data(*args, **kwarg):
 
-    train_load_data = np.load('D:\\mod_train_data.npz', allow_pickle=True)
-    test_load_data = np.load('D:\\mod_test_data.npz', allow_pickle=True)
+    train_load_data = np.load(train_data_path, allow_pickle=True)
+    test_load_data = np.load(test_data_path, allow_pickle=True)
 
     train_labels = train_load_data['label']
     train_feats = train_load_data['data']
@@ -171,7 +182,7 @@ def load_train_data(*args, **kwarg):
 
 
 num_batch = 64
-epoch_num = 100
+epoch_num = 30
 num_label = 17
 
 load_mode = 0
@@ -206,7 +217,7 @@ if load_mode == 1:
 
 history = model.fit(train_mfcc_feats, train_labels,
                         batch_size=num_batch, epochs=epoch_num, verbose=1,
-                        validation_split=0.2, shuffle=True)
+                        validation_split=0.1, shuffle=True)
 
 loss, metric_res = model.evaluate(x=test_mfcc_feats,
         y=test_labels, verbose=1)   # "return_dict" argument doesn't work in tf 2.1
