@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #%%
 '''
 # decoder for command speech

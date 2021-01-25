@@ -39,7 +39,7 @@ buffer_s = 3000
 rate_list = [0.97, 0.94, 0.91, 0.88, 1.03, 1.06, 1.09, 1.12, 1.0]
 
 def main():
-    generate_train_data_for_all_1(mod_full_data_files_name)
+    generate_train_data_for_all(mod_full_data_files_name)
 
     return
 
@@ -52,7 +52,8 @@ def time_stretch(data, aug_rate):
     return aug_data
 
 
-##
+## simply augmented
+## train and test
 def generate_train_data(text_filepath):
 
     fwb_train = open(aug_train_data_path, 'wb')
@@ -144,7 +145,7 @@ def generate_train_data(text_filepath):
     return
 
 
-##
+## augmented all in one (train + test)
 def generate_train_data_for_all(text_filepath):
 
     fwb_train = open(train_data_for_all, 'wb')
@@ -220,7 +221,7 @@ def generate_train_data_for_all(text_filepath):
     return
 
 
-##
+## augmented 90% in one (train + test)
 def generate_train_data_for_all_1(text_filepath):
 
     fwb_train = open(train_data_sampling_one, 'wb')
@@ -318,6 +319,156 @@ def generate_train_data_for_all_1(text_filepath):
     print(len(train_data))
 
     return
+
+
+def return_random_num():
+    rate = random.choice([1.03, 1.02, 1.01, 1.0, 0.99, 0.98, 0.97])
+    rand_size = random.randrange(200, 240)
+    return rate, rand_size
+
+
+##
+def cut_raw_data(data, **kwargs):
+
+    if "frame_time" in kwargs.keys():
+        frame_time = kwargs['frame_time']
+    if "shift_time" in kwargs.keys():
+        shift_time = kwargs['shift_time']
+    if "sample_rate" in kwargs.keys():
+        sr = kwargs['sample_rate']
+    if "buffer_size" in kwargs.keys():
+        buf_size = kwargs['buffer_size']
+    if "full_size" in kwargs.keys():
+        full_size = kwargs['full_size']
+    if "threshold_value" in kwargs.keys():
+        trigger_val = kwargs['threshold_value']
+
+    frame_size = int(sr*frame_time)
+    shift_size = int(sr*shift_time)
+
+    num_frames = len(data)//(frame_size-shift_size)+1
+
+    mean_val_list = list()
+
+    for i in range(num_frames):
+        temp_n = i*(frame_size-shift_size)
+        if temp_n+frame_size > len(data):
+            one_frame_data = data[temp_n:len(data)]
+        else:
+            one_frame_data = data[temp_n:temp_n+frame_size]
+        mean_val_list.append(np.mean(np.abs(one_frame_data)))
+
+    for i,start in enumerate(mean_val_list):
+        if trigger_val < start:
+            start_index = i
+            break
+        else:
+            start_index = 0
+
+    for i,end in enumerate(reversed(mean_val_list)):
+        if trigger_val < end:
+            end_index = len(mean_val_list)-i
+            break
+        else:
+            end_index = len(mean_val_list)
+
+    ##
+    temp_signal_data = list()
+
+
+    temp = (frame_size-shift_size)*start_index-buf_size
+    if temp <= 0:
+        temp = 0
+
+    result = data[temp:(frame_size-shift_size)*end_index+buf_size]
+
+    if full_size > len(result):
+        result = fit_determined_size(result, full_size=full_size)
+        result = add_noise_data(result, full_size=full_size)
+
+    return result
+
+
+## augment all
+## time stretch random frame
+def generate_train_data_for_all_2(text_filepath):
+
+    fwb_train = open(train_data_for_all, 'wb')
+
+    train_data_list = list()
+    train_label_list = list()
+
+    num = 1
+    with open(text_filepath, 'r', encoding='utf-8') as fr:
+        while True:
+            line = fr.readline()
+            line = line.split()
+            if not line: break
+
+            samplerate, data = wavfile.read(line[0])
+
+
+
+            for r in rate_list:
+                one_train = list()
+                if r == 1.0:
+                    logfb_feat = logfbank(data)
+                    logfb_feat = util_module.standardization_func(logfb_feat)
+                    one_train.append(logfb_feat)
+                    one_train.append(int(line[-1]))
+                    train_data_list.append(one_train)
+                else:
+                    # aug_data = time_stretch(data, r)
+                    aug_data = librosa.effects.time_stretch(data, r)
+                    if len(aug_data) < sample_rate*recording_time:
+                        aug_data = signal_trigger.evaluate_mean_of_frame(aug_data,
+                                        frame_time=frame_t,
+                                        shift_time=shift_t,
+                                        sample_rate=sample_rate,
+                                        buffer_size=buffer_s,
+                                        full_size = sample_rate*recording_time,
+                                        threshold_value=0.5)
+
+                    elif len(aug_data) > sample_rate*recording_time:
+                        aug_data = signal_trigger.evaluate_mean_of_frame(aug_data,
+                                        frame_time=frame_t,
+                                        shift_time=shift_t,
+                                        sample_rate=sample_rate,
+                                        buffer_size=buffer_s,
+                                        full_size = sample_rate*recording_time,
+                                        threshold_value=1.0)
+                    if len(aug_data) > sample_rate*recording_time:
+                        continue
+
+                    logfb_feat = logfbank(aug_data)
+                    logfb_feat = util_module.standardization_func(logfb_feat)
+                    one_train.append(logfb_feat)
+                    one_train.append(int(line[-1]))
+                    train_data_list.append(one_train)
+
+            print('one data complete...', num)
+            num+=1
+
+    random.shuffle(train_data_list)
+
+    temp_train_data = list()
+    temp_train_label = list()
+
+    for one in train_data_list:
+        # print(one)
+        temp_train_data.append(one[0])
+        temp_train_label.append(one[1])
+
+    train_data = np.asarray(temp_train_data)
+    train_label = np.asarray(temp_train_label)
+
+    np.savez_compressed(fwb_train, label=train_label, data=train_data, rate=samplerate)
+
+    print(len(train_data))
+
+    return
+
+
 
 
 

@@ -1,5 +1,4 @@
 
-
 import sys
 
 temp = __file__.split('\\')
@@ -148,7 +147,7 @@ def load_train_data(*args, **kwarg):
 
 
     # train_data_path = 'D:\\mod_train_data.npz'
-    # test_data_path = 'D:\\mod_test_data.npz'
+    test_data_path = 'D:\\mod_test_data.npz'
 
     # train_data_path = 'D:\\aug_train_data.npz'
     # train_data_path = 'D:\\train_data_for_all.npz'
@@ -157,8 +156,10 @@ def load_train_data(*args, **kwarg):
     # train_data_path = 'D:\\aug_norm_train_data.npz'
     # test_data_path = 'D:\\aug_norm_test_data.npz'
 
-    train_data_path = 'D:\\train_data_sampling_one.npz'
-    test_data_path = 'D:\\test_data_sampling_one.npz'
+    # train_data_path = 'D:\\train_data_sampling_one.npz'
+    # test_data_path = 'D:\\test_data_sampling_one.npz'
+
+    train_data_path = 'D:\\train_data_for_all_with_zeroth.npz'
 
     train_load_data = np.load(train_data_path, allow_pickle=True)
     test_load_data = np.load(test_data_path, allow_pickle=True)
@@ -232,7 +233,8 @@ if __name__ == '__main__':
         print("\n\n%d th epoch\n"%(epo+1))
 
         if load_mode == 1:
-            model.load_weights('D:\\resnet_model.h5')
+            # model.load_weights('D:\\resnet_model.h5')
+            model.load_weights(h5_path_1)
 
         history = model.fit(train_mfcc_feats, train_labels,
                                 batch_size=num_batch, epochs=1, verbose=1,
@@ -243,10 +245,12 @@ if __name__ == '__main__':
                                             # but, after 2.2, it workss
         # print(history.history['val_accuracy'])
         temp = metric_res+history.history['val_accuracy'][0]
-        model.save('D:\\resnet_model.h5')
+        # model.save('D:\\resnet_model.h5')
+        model.save(h5_path_1)
         if temp > max_acc:
             max_acc = temp
-            model.save('D:\\resnet_model_best.h5')
+            # model.save('D:\\resnet_model_best.h5')
+            model.save(h5_path_best_1)
             print("recent max acc value : ", max_acc)
 
         graph_cl.make_list(train_result=history, eval_loss=loss, eval_acc=metric_res)

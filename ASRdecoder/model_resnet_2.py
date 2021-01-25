@@ -1,5 +1,4 @@
 
-
 import sys
 
 temp = __file__.split('\\')
@@ -147,11 +146,13 @@ max_number = 200
 # train_data_path = 'D:\\mod_train_data.npz'
 # test_data_path = 'D:\\mod_test_data.npz'
 
-train_data_path = 'D:\\aug_train_data.npz'
+# train_data_path = 'D:\\aug_train_data.npz'
 test_data_path = 'D:\\aug_test_data.npz'
 
 # train_data_path = 'D:\\aug_norm_train_data.npz'
 # test_data_path = 'D:\\aug_norm_test_data.npz'
+
+train_data_path = 'D:\\train_data_for_all_with_zeroth.npz'
 
 def load_train_data(*args, **kwarg):
 

@@ -1,5 +1,8 @@
 import sys
 sys.path.append('D:\\')
+temp = __file__.split('\\')
+temp = '\\'.join(temp[:-2])
+sys.path.append(temp)
 
 import numpy as np
 import time
@@ -9,8 +12,8 @@ from scipy.io import wavfile
 from python_speech_features import mfcc
 from python_speech_features import logfbank
 
-from . import draw_single_graph
-from .util_module import standardization_func, new_minmax_normal, transpose_the_matrix
+import draw_single_graph
+from util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
 titles_list = []
 xlabels_list = []

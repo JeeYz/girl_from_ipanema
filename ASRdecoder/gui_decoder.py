@@ -23,7 +23,8 @@ from scipy.io import wavfile
 
 from sklearn.preprocessing import Normalizer
 
-from analysis_signal import draw_single_graph, signal_trigger, util_module
+from analysis_signal import signal_trigger, util_module
+from analysis_signal.util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 from ASRdecoder import model_resnet as mr
 
 from tkinter import *
@@ -57,6 +58,7 @@ voice_size = recording_time*sample_rate
 chunk = 400
 per_sec = sample_rate/chunk
 num = 0
+start_time, end_time = float(), float()
 
 label_dict = {0: 'None',
             1: 'album',
@@ -110,6 +112,7 @@ def receive_data(data, stack):
                                         buffer_size=buffer_s,
                                         full_size = sample_rate*recording_time,
                                         threshold_value=0.5)
+            start_time = time.time()
             decoding_wav_command(data)
             num = 0
 
@@ -233,20 +236,28 @@ def decoding_wav_command(data):
     h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
 
 
-    model.load_weights('D:\\resnet_model.h5')
+    # model.load_weights('D:\\resnet_model.h5')
+    model.load_weights(h5_path_1)
+    # model.load_weights(h5_path_best_1)
 
     predictions = model.predict(test_data, verbose=1)
 
     # a = tf.math.argmax(predictions[0], axis=0)
     # a = np.argmax(predictions)
     # print(predictions[0])
-
+    end_time = time.time()
     print(predictions)
     # print(a)
     a = np.argmax(predictions)
-
-    print(label_dict[a])
+    print(predictions[0][a])
+    if predictions[0][a] > 0.95:
+        print(label_dict[a])
+    else:
+        print(label_dict[0])
     print(predictions.shape)
+    print("decoding time : %f" %(end_time-start_time))
+
+    return
 
 
 #%%

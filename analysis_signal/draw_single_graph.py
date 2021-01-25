@@ -1,4 +1,10 @@
 #%% import sklearn
+import os
+import sys
+temp = __file__.split('\\')
+temp = '\\'.join(temp[:-2])
+sys.path.append(temp)
+
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MaxAbsScaler
@@ -13,15 +19,13 @@ import matplotlib.pyplot as plt
 
 from python_speech_features import mfcc
 from python_speech_features import logfbank
-from .util_module import standardization_func, new_minmax_normal, transpose_the_matrix
-
+from analysis_signal.util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
 
 #%%
 def draw_graph_raw_signal(data, **kwargs):
 
-    if "title_name" in kwargs.keys():
-        title_name = kwargs['title_name']
+    title_name = kwargs['title_name']
 
     plt.figure()
     plt.plot(data)
@@ -39,9 +43,7 @@ def draw_graph_raw_signal(data, **kwargs):
 
 ##
 def draw_graph_logfbank(data, sr, **kwargs):
-
-    if "title_name" in kwargs.keys():
-        title_name = kwargs['title_name']
+    title_name = kwargs['title_name']
 
     # data = logfbank(data, sr)
     data = transpose_the_matrix(data)
@@ -60,7 +62,6 @@ def draw_graph_logfbank(data, sr, **kwargs):
     # plt.show()
 
     return
-
 
 
 
