@@ -237,8 +237,8 @@ def decoding_wav_command(data):
 
 
     # model.load_weights('D:\\resnet_model.h5')
-    model.load_weights(h5_path_1)
-    # model.load_weights(h5_path_best_1)
+    # model.load_weights(h5_path_1)
+    model.load_weights(h5_path_best_1)
 
     predictions = model.predict(test_data, verbose=1)
 
