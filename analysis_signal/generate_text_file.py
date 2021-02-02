@@ -56,6 +56,7 @@ def generate_train_data_for_all_with_zeroth(text_filepath):
         print("\rone data complete...\t%d" %num, end='')
         num+=1
 
+    print('\n\n')
     with open(text_filepath, 'r', encoding='utf-8') as fr:
         while True:
             line = fr.readline()
@@ -77,6 +78,9 @@ def generate_train_data_for_all_with_zeroth(text_filepath):
 
             print("\r one data complete...\t%d" %num, end='')
             num+=1
+
+            if num == 200000:
+                break
 
 
     random.shuffle(train_data_list)
@@ -130,8 +134,8 @@ def generate_zeroth_files_list(data_path, f_format):
 
 ##
 def main():
-    data_list = generate_zeroth_files_list(zeroth_none_data_path, '.wav')
-    generate_text_files(new_none_train_data_zeroth, data_list)
+    # data_list = generate_zeroth_files_list(zeroth_none_data_path, '.wav')
+    # generate_text_files(new_none_train_data_zeroth, data_list)
     generate_train_data_for_all_with_zeroth(new_none_train_data_zeroth)
 
     return

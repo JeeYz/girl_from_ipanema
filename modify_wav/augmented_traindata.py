@@ -36,7 +36,10 @@ frame_t = 0.025
 shift_t = 0.01
 buffer_s = 3000
 
-rate_list = [0.97, 0.94, 0.91, 0.88, 1.03, 1.06, 1.09, 1.12, 1.0]
+rate_list = [
+0.97, 0.94, 0.91, 0.88, 0.85, 0.82, 0.79, 0.76, 0.73, 0.70, 0.67, 0.64, 0.61,
+1.03, 1.06, 1.09, 1.12, 1.15, 1.18, 1.21, 1.24, 1.27, 1.30, 1.33, 1.36, 1.39,
+1.0]
 
 def main():
     generate_train_data_for_all(mod_full_data_files_name)
@@ -198,7 +201,7 @@ def generate_train_data_for_all(text_filepath):
                     one_train.append(int(line[-1]))
                     train_data_list.append(one_train)
 
-            print('one data complete...', num)
+            print('\rone data complete... %d'% num, end='')
             num+=1
 
     random.shuffle(train_data_list)
@@ -479,4 +482,24 @@ def generate_train_data_for_all_2(text_filepath):
 
 ## endl
 if __name__ == '__main__':
-    main()
+    # main()
+
+    loaded_data = np.load(train_data_for_all)
+
+    num = 0
+    for one in loaded_data['data']:
+        if len(one) != 199:
+            num += 1
+            print("\r%d data is corrupted" % num , end='')
+            print(len(one))
+            time.sleep(1000)
+
+    print("\ndone...")
+
+
+
+
+
+
+
+## endl

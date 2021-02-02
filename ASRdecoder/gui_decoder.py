@@ -61,27 +61,43 @@ num = 0
 start_time, end_time = float(), float()
 
 label_dict = {0: 'None',
-            1: 'album',
-            2: 'back',
-            3: 'bright',
-            4: 'call',
-            5: 'camera',
-            6: 'dark',
-            7: 'end',
-            8: 'execute',
-            9: 'init',
-            10: 'picture',
-            11: 'position',
-            12: 'receive',
-            13: 'record',
-            14: 'reject',
-            15: 'stop',
-            16: 'hipnc'}
+            1: 'call', # 전화
+            2: 'camera', # 카메라
+            3: 'picture', # 촬영
+            4: 'record', # 녹화
+            5: 'stop', # 중지
+            6: 'hipnc'}
+
+
+## global model
+num_label = 7
+conv_shape = (199, 26, 1)
+input_vec = tf.keras.Input(shape=conv_shape)
+
+resnet = mr.residual_net_2D()
+
+answer = resnet(input_vec, num_of_classes=num_label)
+
+model = tf.keras.Model(inputs=input_vec, outputs=answer)
+
+#%% epoch training loop
+h5_path_0 = 'D:\\resnet_model_only_train.h5'
+h5_path_best_0 = 'D:\\resnet_model_best_only_train.h5'
+
+h5_path_1 = 'D:\\resnet_model_all.h5'
+h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
+
+
+# model.load_weights('D:\\resnet_model.h5')
+# model.load_weights(h5_path_1)
+model.load_weights(h5_path_1)
+
 
 
 ##
 def receive_data(data, stack):
     # trigger_val = 0.5
+    global start_time
     global num
 
     # print(num, np.mean(np.abs(data)))
@@ -112,6 +128,8 @@ def receive_data(data, stack):
                                         buffer_size=buffer_s,
                                         full_size = sample_rate*recording_time,
                                         threshold_value=0.5)
+
+            data = data[:32000]
             start_time = time.time()
             decoding_wav_command(data)
             num = 0
@@ -195,50 +213,42 @@ def generate_train_data(data):
 
     # print(len(data))
     data = np.asarray(data)
-    wavfile.write("output.wav", 16000, data)
+    # wavfile.write("output.wav", 16000, data)
+
+
 
     logfb_feat = logfbank(data)
     logfb_feat = util_module.standardization_func(logfb_feat)
 
     train_feats = tf.expand_dims(logfb_feat, -1)
     print("data shape : "+ str(train_feats.shape))
-    conv_shape = (train_feats.shape[0], train_feats.shape[1], 1)
+    # conv_shape = (train_feats.shape[0], train_feats.shape[1], 1)
+    conv_shape = (199, 26, 1)
 
     return np.asarray([train_feats]), conv_shape
+
+##
+def print_result(index_num, output_data):
+
+    for i, j in enumerate(output_data[0]):
+        if i == index_num:
+            print("%d : %6.2f %% <<< %s"%(i, j*100, label_dict[index_num]))
+        else:
+            print("%d : %6.2f %%"%(i, j*100))
+
+    return
 
 
 #%%
 def decoding_wav_command(data):
-
-    num_label = 17
+    global end_time
 
     #%% loading data
-    test_data, conv_shape = generate_train_data(data)
+    test_data, _  = generate_train_data(data)
 
     #%% build model
     # input_vec = tf.keras.Input(shape=conv_shape, batch_size=1)
-    input_vec = tf.keras.Input(shape=conv_shape)
-
-    resnet = mr.residual_net_2D()
-
-    answer = resnet(input_vec, num_of_classes=num_label)
-
-    model = tf.keras.Model(inputs=input_vec, outputs=answer)
-
     # model.summary()
-
-
-    #%% epoch training loop
-    h5_path_0 = 'D:\\resnet_model_only_train.h5'
-    h5_path_best_0 = 'D:\\resnet_model_best_only_train.h5'
-
-    h5_path_1 = 'D:\\resnet_model_all.h5'
-    h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
-
-
-    # model.load_weights('D:\\resnet_model.h5')
-    # model.load_weights(h5_path_1)
-    model.load_weights(h5_path_best_1)
 
     predictions = model.predict(test_data, verbose=1)
 
@@ -246,15 +256,62 @@ def decoding_wav_command(data):
     # a = np.argmax(predictions)
     # print(predictions[0])
     end_time = time.time()
-    print(predictions)
-    # print(a)
+    # print(predictions)
+    # # print(a)
     a = np.argmax(predictions)
+    # print(predictions[0][a])
+    # if predictions[0][a] > 0.8:
+    #     print(label_dict[a])
+    # elif a == 2:
+    #     if predictions[0][a] > 0.50:
+    #         print(label_dict[a])
+    #     else:
+    #         print(label_dict[0])
+    # else:
+    #     print(label_dict[0])
+    # print(predictions.shape)
+
+    print('\n')
     print(predictions[0][a])
-    if predictions[0][a] > 0.95:
-        print(label_dict[a])
+
+
+    if a == 0:
+        temp = list()
+        for i in range(1, num_label):
+            if predictions[0][i] > float(1/(num_label-1)):
+                temp.append([i, predictions[0][i]])
+
+        if len(temp) == 1:
+            print(label_dict[temp[0][0]])
+            print_result(temp[0][0], predictions)
+        elif len(temp) > 1:
+            temp_max = 0
+            temp_label = 0
+            for one in temp:
+                if one[1] > temp_max:
+                    temp_max = one[1]
+                    temp_label = one[0]
+            print(label_dict[temp_label])
+            print_result(temp_label, predictions)
+        else:
+            print(label_dict[0])
+            print_result(0, predictions)
     else:
-        print(label_dict[0])
-    print(predictions.shape)
+        # print(label_dict[a])
+        if predictions[0][a] > 0.5:
+            print(label_dict[a])
+            print_result(a, predictions)
+        elif a == 2:
+            if predictions[0][a] > 0.50:
+                print(label_dict[a])
+                print_result(a, predictions)
+            else:
+                print(label_dict[0])
+                print_result(0, predictions)
+        else:
+            print(label_dict[0])
+            print_result(0, predictions)
+
     print("decoding time : %f" %(end_time-start_time))
 
     return
@@ -288,7 +345,8 @@ def main():
 if __name__=='__main__':
     main()
 
-    # sr, data = wavfile.read('output.wav')
-    #
-    # draw_single_graph.draw_graph_raw_signal(data, title_name='raw')
-    # plt.show()
+
+
+
+
+## endl

@@ -13,14 +13,6 @@ import time
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from sklearn import preprocessing
-# 
-# from python_speech_features import logfbank
-# from files_locations import example_filename
-# from analysis_signal import draw_single_graph
-# # import draw_multi_graphs
-# from draw_single_graph import draw_graph_logfbank, draw_graph_logfbank_norm, draw_graph_raw_signal
-#
-# from util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
 def evaluate_mean_of_frame(data, **kwargs):
 

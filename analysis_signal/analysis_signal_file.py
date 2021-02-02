@@ -12,6 +12,7 @@ from scipy.io import wavfile
 from sklearn import preprocessing
 from scipy import signal
 from scipy.ndimage import gaussian_filter1d
+import random
 
 import librosa
 import soundfile
@@ -29,7 +30,10 @@ mod_full_data_files_name = 'D:\\mod_full_data_files_list.txt'
 zeroth_files_list = 'D:\\zeroth_files_list.txt'
 zeroth_data_path = 'D:\\voice_data_backup\\zeroth_korean.tar\\zeroth_korean'
 zeroth_none_data_path = 'D:\\voice_data_backup\\zeroth_none'
+zeroth_none_devided_path_2 = 'D:\\voice_data_backup\\zeroth_none_devided_2'
 full_new_train_data_with_none = 'D:\\full_new_train_data_with_none.txt'
+
+devided_none_data_2 = 'D:\\divided_none_data_2.npz'
 
 sample_rate = 16000
 threshold = 0.5
@@ -79,6 +83,192 @@ def add_buffer(data, len_data):
     result.extend(data)
 
     return result
+
+
+## devide determined size(random 10000~20000)
+def devide_data_2(data):
+
+    data_list = list()
+
+    threshold = 0.5
+    min_len = 10
+    max_len = 20
+    buf_size = 3000
+
+    frame_size = int(sample_rate*0.025)
+    shift_size = int(sample_rate*0.01)
+
+    num_frames = len(data)//(frame_size-shift_size)+1
+
+    data = standardization_func(data)
+
+    # draw_graph_raw_signal(data, title_name='raw')
+    # plt.show()
+    #
+    # time.sleep(1000)
+
+    temp = list()
+    temp_list = list()
+    low_temp = list()
+
+    mean_val_list = list()
+
+    for i in range(num_frames):
+        temp_n = i*(frame_size-shift_size)
+        if temp_n+frame_size > len(data):
+            one_frame_data = data[temp_n:len(data)]
+        else:
+            one_frame_data = data[temp_n:temp_n+frame_size]
+        mean_val_list.append(np.mean(np.abs(one_frame_data)))
+
+    for i,start in enumerate(mean_val_list):
+        if threshold < start:
+            start_index = i
+            break
+        else:
+            start_index = 0
+
+    for i,end in enumerate(reversed(mean_val_list)):
+        if threshold < end:
+            end_index = len(mean_val_list)-i
+            break
+        else:
+            end_index = len(mean_val_list)
+
+    temp = (frame_size-shift_size)*start_index-buf_size
+    if temp <= 0:
+        temp = 0
+
+    result = data[temp:(frame_size-shift_size)*end_index+buf_size]
+
+    # draw_graph_raw_signal(result, title_name='raw')
+    # plt.show()
+    # time.sleep(1000)
+
+    # random.randrange(min_len, max_len)*1000
+
+    start = 0
+    end = 0
+    data_list = list()
+
+    while True:
+        temp = random.randrange(min_len, max_len)*1000
+        end = start+temp
+
+        if end > len(result):
+            end = len(result)
+
+        if min_len*1000 > end-start:
+            break
+
+        temp_data = result[start:end]
+        noise_data = np.random.randn(buf_size)*0.01
+        # noise_data = noise_data.tolist()
+        # temp_data = noise_data.extend(temp_data)
+        temp_data = np.append(noise_data, temp_data, axis=0)
+        # temp_data = evaluate_mean_of_frame(temp_data,
+        #                 frame_time=0.025,
+        #                 shift_time=0.01,
+        #                 sample_rate=16000,
+        #                 buffer_size=3000,
+        #                 full_size=32000,
+        #                 threshold_value=0.5)
+        # one_data = list()
+
+        # logfb_feat = logfbank(temp_data)
+        # logfb_feat = standardization_func(logfb_feat)
+
+        # one_data.append(logfb_feat)
+        # one_data.append(temp_data)
+        # one_data.append(0)
+        data_list.append(temp_data)
+
+        # draw_graph_raw_signal(temp_data, title_name='raw')
+        # draw_graph_logfbank(logfb_feat, 16000, title_name='logfb')
+
+        start = end
+
+
+
+    # draw_graph_raw_signal(result, title_name='raw')
+    # plt.show()
+    # print(len(result))
+    # time.sleep(1000)
+
+    return data_list
+
+
+## devide algorithm #2
+def devide_data_1(data):
+
+    data_list = list()
+
+    add_num = 5
+    min_len = 10
+    max_len = 20
+
+    frame_size = int(sample_rate*0.025)
+    shift_size = int(sample_rate*0.01)
+
+    num_frames = len(data)//(frame_size-shift_size)+1
+
+    data = standardization_func(data)
+
+    temp = list()
+    temp_list = list()
+    low_temp = list()
+
+    for i in range(num_frames):
+        temp_n = i*(frame_size-shift_size)
+        if temp_n+frame_size > len(data):
+            one_frame_data = data[temp_n:len(data)]
+        else:
+            one_frame_data = data[temp_n:temp_n+frame_size-shift_size]
+
+            if threshold < np.mean(np.abs(one_frame_data)):
+                if low_temp != [] and len(low_temp) < add_num*(frame_size-shift_size):
+                    temp.extend(low_temp)
+
+                temp.extend(one_frame_data)
+                low_temp = list()
+            else:
+                if temp != [] and len(low_temp) > add_num*(frame_size-shift_size):
+                    st_num = temp_n-len(temp)-(add_num-1)*(frame_size-shift_size)
+                    end_num = temp_n+frame_size-shift_size-len(temp)
+                    front_data = data[st_num:end_num]
+
+                    new_list = list()
+                    new_list.extend(front_data)
+                    new_list.extend(temp)
+                    temp = add_buffer(new_list, add_num*(frame_size-shift_size))
+                    temp.extend(low_temp)
+                    data_list.append(temp)
+                    temp = list()
+                    # print(len(temp))
+
+                low_temp.extend(one_frame_data)
+                # print(len(low_temp))
+
+
+    # print(len(data_list))
+
+    new_data_list = list()
+
+    for one in data_list:
+        if len(one) > at_least_len and len(one) < max_len:
+            new_data_list.append(one)
+
+    # print(data_list)
+    # for one in new_data_list:
+    #     draw_graph_raw_signal(one, title_name='raw')
+    #     print(len(one))
+    #
+    # draw_graph_raw_signal(data, title_name='raw')
+    #
+    # plt.show()
+    # time.sleep(10000)
+
+    return new_data_list
 
 
 ##
@@ -170,6 +360,7 @@ def refine_data(data_list):
         if len(refine_d) != 32000:
             print(one)
             print(len(refine_d))
+            time.sleep(1000)
 
 
     #     draw_graph_raw_signal(refine_d, title_name='raw')
@@ -200,7 +391,7 @@ def make_none_data(file_path, target_path):
     # plt.show()
     # time.sleep(1000)
 
-    result = devide_data(data)
+    result = devide_data_2(data)
     result = refine_data(result)
     generate_wav_files(result, target_path)
 
@@ -223,7 +414,7 @@ def main():
         temp = temp_path[-1].split('\\')[:-1]
         temp = '\\'.join(temp)
 
-        folder_path = zeroth_none_data_path + '\\' + temp
+        folder_path = zeroth_none_devided_path_2 + '\\' + temp
         check_files.createFolder(folder_path)
 
         file_path = folder_path + '\\' + temp_fn
