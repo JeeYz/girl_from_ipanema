@@ -269,16 +269,29 @@ def decoding_wav_command(data):
     num_label = 7
 
     #%% loading data
+
+    temp_start = time.time()
     test_data, conv_shape = generate_train_data(data)
     test_data = np.array(test_data)
+    print('================')
+    print(time.time()-temp_start)
+    print('================')
+
     # print(np.shape(test_data))
     # print(input_details)
+    # print(interpreter.get_input_details())
+
+    # temp_start = time.time()
 
     interpreter.set_tensor(input_details['index'], test_data)
 
     interpreter.invoke()
 
     output_data = interpreter.get_tensor(output_details['index'])
+
+    # print('================')
+    # print(time.time()-temp_start)
+    # print('================')
 
     end_time = time.time()
     # print(output_data)

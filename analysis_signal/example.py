@@ -34,17 +34,50 @@ train_data_all_none_devided_2 = 'D:\\train_data_all_none_devided_2.npz'
 
 zeroth_path_devided_2 = 'D:\\voice_data_backup\\zeroth_none_devided_2'
 
-new_ver_train_data_path = 'D:\\new_ver_train_data\\train_all_devided_2_dif_ver_3.npz'
-# new_ver_train_data_path = 'D:\\new_ver_train_data\\train_all_devided_2_dif_ver.npz'
 
-
-label_mapping_dict = {4:[1, 'call'],
-                    5:[2, 'camera'],
-                    10:[3, 'picture'],
-                    13:[4, 'record'],
-                    15:[5, 'stop'],
-                    16:[6, 'hipnc'],
-                    0:[0, 'None']}
+## command
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\command_train_data.npz'
+# label_mapping_dict = {4:[1, 'call'],
+#                     5:[2, 'camera'],
+#                     10:[3, 'picture'],
+#                     13:[4, 'record'],
+#                     15:[5, 'stop'],
+#                     7:[6, 'end'],
+#                     0:[0, 'None']}
+# ## call
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\call_command_train_data.npz'
+# label_mapping_dict = {4:[1, 'call'],
+#                     0:[0, 'None']}
+#
+# ## camera
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\camera_command_train_data.npz'
+# label_mapping_dict = {5:[1, 'camera'],
+#                     0:[0, 'None']}
+#
+# ## picture
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\picture_command_train_data.npz'
+# label_mapping_dict = {10:[1, 'picture'],
+#                     0:[0, 'None']}
+#
+# ## record
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\record_command_train_data.npz'
+# label_mapping_dict = {13:[1, 'record'],
+#                     0:[0, 'None']}
+#
+# ## stop
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\stop_command_train_data.npz'
+# label_mapping_dict = {15:[1, 'stop'],
+#                     0:[0, 'None']}
+#
+# ## end
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\end_command_train_data.npz'
+# label_mapping_dict = {7:[1, 'end'],
+#                     0:[0, 'None']}
+#
+## keyword
+# new_ver_train_data_path = 'D:\\new_ver_train_data\\keyword_train_data.npz'
+# label_mapping_dict = {16:[1, 'hipnc'],
+#                     0:[0, 'None']}
 
 
 ##

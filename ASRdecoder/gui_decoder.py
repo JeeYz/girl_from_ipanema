@@ -53,6 +53,7 @@ sample_rate = 16000
 recording_time = 2
 frame_t = 0.025
 shift_t = 0.01
+# buffer_s = 3000
 buffer_s = 3000
 voice_size = recording_time*sample_rate
 chunk = 400
@@ -60,38 +61,74 @@ per_sec = sample_rate/chunk
 num = 0
 start_time, end_time = float(), float()
 
+
+# label_dict = {0: 'None',
+#             1: 'album',
+#             2: 'back',
+#             3: 'bright',
+#             4: 'call',
+#             5: 'camera',
+#             6: 'dark',
+#             7: 'end',
+#             8: 'execute',
+#             9: 'init',
+#             10: 'picture',
+#             11: 'position',
+#             12: 'receive',
+#             13: 'record',
+#             14: 'reject',
+#             15: 'stop',
+#             16: 'hipnc'}
+
+
+# label_dict = {0: 'None',
+#             1: 'call', # 전화
+#             2: 'camera', # 카메라
+#             3: 'picture', # 촬영
+#             4: 'record', # 녹화
+#             5: 'stop', # 중지
+#             6: 'hipnc'}
+#
+# label_dict = {0: 'None',
+#             1: 'right answer'}
+
 label_dict = {0: 'None',
             1: 'call', # 전화
             2: 'camera', # 카메라
             3: 'picture', # 촬영
             4: 'record', # 녹화
             5: 'stop', # 중지
-            6: 'hipnc'}
+            6: 'end'}  # 종료
 
 
 ## global model
-num_label = 7
+num_label = 2
 conv_shape = (199, 26, 1)
+
 input_vec = tf.keras.Input(shape=conv_shape)
-
 resnet = mr.residual_net_2D()
-
 answer = resnet(input_vec, num_of_classes=num_label)
-
 model = tf.keras.Model(inputs=input_vec, outputs=answer)
 
 #%% epoch training loop
-h5_path_0 = 'D:\\resnet_model_only_train.h5'
-h5_path_best_0 = 'D:\\resnet_model_best_only_train.h5'
+# h5_path_0 = 'D:\\resnet_model_only_train.h5'
+# h5_path_best_0 = 'D:\\resnet_model_best_only_train.h5'
+#
+# h5_path_1 = 'D:\\resnet_model_all.h5'
+# h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
 
-h5_path_1 = 'D:\\resnet_model_all.h5'
-h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
-
+parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\call_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\camera_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\picture_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\record_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\stop_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\end_model_parameter.h5'
 
 # model.load_weights('D:\\resnet_model.h5')
 # model.load_weights(h5_path_1)
-model.load_weights(h5_path_1)
-
+model.load_weights(parameter_h5)
 
 
 ##
@@ -100,20 +137,11 @@ def receive_data(data, stack):
     global start_time
     global num
 
-    # print(num, np.mean(np.abs(data)))
-    # data = util_module.standardization_func(data)
-    # print(num, np.mean(np.abs(data)))
-
     mean_val = np.mean(np.abs(data))
-
-    # data = data.tolist()
 
     stack.extend(data)
     if len(stack) > sample_rate*(recording_time+1):
         del stack[0:chunk]
-
-    # print(len(stack))
-    # print(num, mean_val)
 
     if float(trigger_val) <= float(mean_val) or num != 0:
         # print(num, mean_val)
@@ -204,18 +232,7 @@ def record_voice():
 ##
 def generate_train_data(data):
 
-    max_number = 200
-
-    # print(len(data))
-
-    # draw_single_graph.draw_graph_raw_signal(data, title_name='raw')
-    # plt.show()
-
-    # print(len(data))
     data = np.asarray(data)
-    # wavfile.write("output.wav", 16000, data)
-
-
 
     logfb_feat = logfbank(data)
     logfb_feat = util_module.standardization_func(logfb_feat)
@@ -256,7 +273,7 @@ def decoding_wav_command(data):
     # a = np.argmax(predictions)
     # print(predictions[0])
     end_time = time.time()
-    # print(predictions)
+    print(predictions)
     # # print(a)
     a = np.argmax(predictions)
     # print(predictions[0][a])
@@ -274,45 +291,46 @@ def decoding_wav_command(data):
     print('\n')
     print(predictions[0][a])
 
+    # if a == 0:
+    #     temp = list()
+    #     for i in range(1, num_label):
+    #         if predictions[0][i] > float(1/(num_label-1)):
+    #             temp.append([i, predictions[0][i]])
+    #
+    #     if len(temp) == 1:
+    #         print(label_dict[temp[0][0]])
+    #         print_result(temp[0][0], predictions)
+    #     elif len(temp) > 1:
+    #         temp_max = 0
+    #         temp_label = 0
+    #         for one in temp:
+    #             if one[1] > temp_max:
+    #                 temp_max = one[1]
+    #                 temp_label = one[0]
+    #         print(label_dict[temp_label])
+    #         print_result(temp_label, predictions)
+    #     else:
+    #         print(label_dict[0])
+    #         print_result(0, predictions)
+    # else:
+    #     # print(label_dict[a])
+    #     if predictions[0][a] > 0.5:
+    #         print(label_dict[a])
+    #         print_result(a, predictions)
+    #     elif a == 2:
+    #         if predictions[0][a] > 0.50:
+    #             print(label_dict[a])
+    #             print_result(a, predictions)
+    #         else:
+    #             print(label_dict[0])
+    #             print_result(0, predictions)
+    #     else:
+    #         print(label_dict[0])
+    #         print_result(0, predictions)
 
-    if a == 0:
-        temp = list()
-        for i in range(1, num_label):
-            if predictions[0][i] > float(1/(num_label-1)):
-                temp.append([i, predictions[0][i]])
-
-        if len(temp) == 1:
-            print(label_dict[temp[0][0]])
-            print_result(temp[0][0], predictions)
-        elif len(temp) > 1:
-            temp_max = 0
-            temp_label = 0
-            for one in temp:
-                if one[1] > temp_max:
-                    temp_max = one[1]
-                    temp_label = one[0]
-            print(label_dict[temp_label])
-            print_result(temp_label, predictions)
-        else:
-            print(label_dict[0])
-            print_result(0, predictions)
-    else:
-        # print(label_dict[a])
-        if predictions[0][a] > 0.5:
-            print(label_dict[a])
-            print_result(a, predictions)
-        elif a == 2:
-            if predictions[0][a] > 0.50:
-                print(label_dict[a])
-                print_result(a, predictions)
-            else:
-                print(label_dict[0])
-                print_result(0, predictions)
-        else:
-            print(label_dict[0])
-            print_result(0, predictions)
-
+    print("label : %d\tstring : %s" % (a, label_dict[a]))
     print("decoding time : %f" %(end_time-start_time))
+    print('\n\n')
 
     return
 

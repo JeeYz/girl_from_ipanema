@@ -67,6 +67,11 @@ def evaluate_mean_of_frame(data, **kwargs):
     if full_size > len(result):
         result = fit_determined_size(result, full_size=full_size)
         result = add_noise_data(result, full_size=full_size)
+    elif full_size == len(result):
+        result = add_noise_data(result, full_size=full_size)
+    else:
+        result = result[:full_size]
+        result = add_noise_data(result, full_size=full_size)
 
     return result
 

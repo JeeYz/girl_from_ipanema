@@ -13,6 +13,10 @@ from sklearn import preprocessing
 
 #%% standardization
 
+import pyaudio as pa
+from scipy.io import wavfile
+import wave
+
 import numpy as np
 import time
 import matplotlib.pyplot as plt
@@ -21,6 +25,9 @@ from python_speech_features import mfcc
 from python_speech_features import logfbank
 from analysis_signal.util_module import standardization_func, new_minmax_normal, transpose_the_matrix
 
+
+def standardization_func(data):
+    return (data-np.mean(data))/np.std(data)
 
 #%%
 def draw_graph_raw_signal(data, **kwargs):
@@ -34,7 +41,7 @@ def draw_graph_raw_signal(data, **kwargs):
     plt.ylabel('amplitude')
     plt.title(title_name)
 
-    plt.tight_layout()
+    # plt.tight_layout()
     # plt.show()
 
     return
@@ -95,6 +102,90 @@ def draw_graph_logfbank_norm(data, sr, **kwargs):
 
 
 
+
+## main
+if __name__ == '__main__':
+
+    chunk = 400
+    sample_format = pa.paInt16
+    channels = 1
+    sr = 16000
+    FORMAT = pa.paInt16
+
+    seconds = 2
+
+    p = pa.PyAudio()
+
+    # recording
+    print('Recording')
+
+    stream = p.open(format=sample_format, channels=channels, rate=sr,
+                    frames_per_buffer=chunk, input=True)
+
+    # frames = []
+    data = list()
+
+    for i in range(int(sr/chunk*seconds)):
+        temp = stream.read(chunk, exception_on_overflow = False)
+        temp = np.frombuffer(temp, 'int16')
+        data.append(temp)
+        # print(len(temp))
+        # data.extend(temp)
+
+    waveFile = wave.open('output_0.wav', 'wb')
+
+    waveFile.setnchannels(channels)
+
+    waveFile.setsampwidth(p.get_sample_size(FORMAT))
+
+    waveFile.setframerate(sr)
+
+    waveFile.writeframes(b''.join(data))
+
+    waveFile.close()
+
+    sampler, data = wavfile.read('output_0.wav')
+    print(data)
+    data = standardization_func(data)
+    draw_graph_raw_signal(data, title_name='raw')
+
+    stream = p.open(format=sample_format, channels=channels, rate=sr,
+                    frames_per_buffer=chunk, input=True)
+
+    # frames = []
+
+    print('Recording')
+    data = list()
+
+    for i in range(int(sr/chunk*seconds)):
+        temp = stream.read(chunk, exception_on_overflow = False)
+        temp = np.frombuffer(temp, 'int16')
+        data.append(temp)
+        # print(len(temp))
+        # data.extend(temp)
+
+    waveFile = wave.open('output_1.wav', 'wb')
+
+    waveFile.setnchannels(channels)
+
+    waveFile.setsampwidth(p.get_sample_size(FORMAT))
+
+    waveFile.setframerate(sr)
+
+    waveFile.writeframes(b''.join(data))
+
+    waveFile.close()
+
+    sampler, data = wavfile.read('output_1.wav')
+    data = standardization_func(data)
+    draw_graph_raw_signal(data, title_name='raw')
+
+    plt.show()
+
+    stream.stop_stream()
+    stream.close()
+
+    p.terminate()
 
 
 
