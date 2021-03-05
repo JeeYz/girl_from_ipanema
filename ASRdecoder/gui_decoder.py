@@ -117,14 +117,38 @@ model = tf.keras.Model(inputs=input_vec, outputs=answer)
 # h5_path_1 = 'D:\\resnet_model_all.h5'
 # h5_path_best_1 = 'D:\\resnet_model_best_all.h5'
 
-parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_3.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_4.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_6.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_7.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_8.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_9.h5'
+parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_10.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_2.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_3.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_6.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_10.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\call_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\call_model_parameter_8.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\call_model_parameter_10.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\camera_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\camera_model_parameter_10.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\picture_model_parameter.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\picture_model_parameter_10.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\picture_model_parameter_8.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\record_model_parameter.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\stop_model_parameter.h5'
+
 # parameter_h5 = 'D:\\new_ver_train_data\\end_model_parameter.h5'
+
 
 # model.load_weights('D:\\resnet_model.h5')
 # model.load_weights(h5_path_1)

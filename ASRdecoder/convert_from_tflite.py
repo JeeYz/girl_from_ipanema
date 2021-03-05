@@ -5,24 +5,64 @@ from tensorflow import keras
 save_path = "D:\\new_ver_train_data"
 
 # keyword
-keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter.h5"
-keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter.tflite"
-keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter.pb"
+# keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter.h5"
+# keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter.tflite"
+# keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter.pb"
+
+# keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter_3.h5"
+# keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter_3.tflite"
+# keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter_3.pb"
+
+# keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter_4.h5"
+# keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter_4.tflite"
+# keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter_4.pb"
+
+# keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter_5.h5"
+# keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter_5.tflite"
+# keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter_5.pb"
+
+# keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter_8.h5"
+# keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter_8.tflite"
+# keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter_8.pb"
+
+keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter_10.h5"
+keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter_10.tflite"
+keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter_10.pb"
+
+# keyword_h5 = "D:\\new_ver_train_data\\keyword_model_parameter_6.h5"
+# keyword_tflite = "D:\\new_ver_train_data\\keyword_model_parameter_6.tflite"
+# keyword_pb = "D:\\new_ver_train_data\\keyword_model_parameter_6.pb"
 
 # command
-command_h5 = "D:\\new_ver_train_data\\command_model_parameter.h5"
-command_tflite = "D:\\new_ver_train_data\\command_model_parameter.tflite"
-command_pb = "D:\\new_ver_train_data\\command_model_parameter.pb"
+# command_h5 = "D:\\new_ver_train_data\\command_model_parameter.h5"
+# command_tflite = "D:\\new_ver_train_data\\command_model_parameter.tflite"
+# command_pb = "D:\\new_ver_train_data\\command_model_parameter.pb"
+
+# command_h5 = "D:\\new_ver_train_data\\command_model_parameter_3.h5"
+# command_tflite = "D:\\new_ver_train_data\\command_model_parameter_3.tflite"
+# command_pb = "D:\\new_ver_train_data\\command_model_parameter_3.pb"
+
+command_h5 = "D:\\new_ver_train_data\\command_model_parameter_10.h5"
+command_tflite = "D:\\new_ver_train_data\\command_model_parameter_10.tflite"
+command_pb = "D:\\new_ver_train_data\\command_model_parameter_10.pb"
 
 # call
-call_h5 = "D:\\new_ver_train_data\\call_model_parameter.h5"
-call_tflite = "D:\\new_ver_train_data\\call_model_parameter.tflite"
-call_pb = "D:\\new_ver_train_data\\call_model_parameter.pb"
+# call_h5 = "D:\\new_ver_train_data\\call_model_parameter.h5"
+# call_tflite = "D:\\new_ver_train_data\\call_model_parameter.tflite"
+# call_pb = "D:\\new_ver_train_data\\call_model_parameter.pb"
+
+call_h5 = "D:\\new_ver_train_data\\call_model_parameter_10.h5"
+call_tflite = "D:\\new_ver_train_data\\call_model_parameter_10.tflite"
+call_pb = "D:\\new_ver_train_data\\call_model_parameter_10.pb"
 
 # camera
-camera_h5 = "D:\\new_ver_train_data\\camera_model_parameter.h5"
-camera_tflite = "D:\\new_ver_train_data\\camera_model_parameter.tflite"
-camera_pb = "D:\\new_ver_train_data\\camera_model_parameter.pb"
+# camera_h5 = "D:\\new_ver_train_data\\camera_model_parameter.h5"
+# camera_tflite = "D:\\new_ver_train_data\\camera_model_parameter.tflite"
+# camera_pb = "D:\\new_ver_train_data\\camera_model_parameter.pb"
+
+camera_h5 = "D:\\new_ver_train_data\\camera_model_parameter_10.h5"
+camera_tflite = "D:\\new_ver_train_data\\camera_model_parameter_10.tflite"
+camera_pb = "D:\\new_ver_train_data\\camera_model_parameter_10.pb"
 
 # picture
 picture_h5 = "D:\\new_ver_train_data\\picture_model_parameter.h5"

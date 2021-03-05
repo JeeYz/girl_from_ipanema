@@ -105,25 +105,37 @@ img_label = Label(root, image=mic_photo, borderwidth=0)
 ## global model
 conv_shape = (199, 26, 1)
 
-test_bool = True
+test_bool = False
 
 ## keyword global model
 keyword_label_num = 2
 if test_bool == True:
-    keyword_tflite_file = 'D:\\new_ver_train_data\\keyword_model_parameter.tflite'
+    keyword_tflite_file = 'D:\\new_ver_train_data\\keyword_model_parameter_4.tflite'
 elif test_bool == False:
-    keyword_tflite_file = 'keyword_model_parameter.tflite'
+    keyword_tflite_file = 'keyword_model_parameter_4.tflite'
 keyword_interpreter = tf.lite.Interpreter(model_path=keyword_tflite_file)
 keyword_interpreter.allocate_tensors()
 keyword_input_details = keyword_interpreter.get_input_details()[0]
 keyword_output_details = keyword_interpreter.get_output_details()[0]
 
+## keyword confirm
+keyword_conf_label_num = 2
+if test_bool == True:
+    # keyword_tflite_file = 'D:\\new_ver_train_data\\keyword_model_parameter_3.tflite'
+    keyword_conf_tflite_file = 'D:\\new_ver_train_data\\keyword_model_parameter_4.tflite'
+elif test_bool == False:
+    keyword_conf_tflite_file = 'keyword_model_parameter_4.tflite'
+keyword_conf_interpreter = tf.lite.Interpreter(model_path=keyword_conf_tflite_file)
+keyword_conf_interpreter.allocate_tensors()
+keyword_conf_input_details = keyword_conf_interpreter.get_input_details()[0]
+keyword_conf_output_details = keyword_conf_interpreter.get_output_details()[0]
+
 ## global command
 command_label_num = 7
 if test_bool == True:
-    command_tflite_file = 'D:\\new_ver_train_data\\command_model_parameter.tflite'
+    command_tflite_file = 'D:\\new_ver_train_data\\command_model_parameter_3.tflite'
 elif test_bool == False:
-    command_tflite_file = 'command_model_parameter.tflite'
+    command_tflite_file = 'command_model_parameter_3.tflite'
 command_interpreter = tf.lite.Interpreter(model_path=command_tflite_file)
 command_interpreter.allocate_tensors()
 command_input_details = command_interpreter.get_input_details()[0]
@@ -237,7 +249,7 @@ def video_thread():
             break
 
         elif control_para==1:
-            img_name = str(now) + '.png'
+            img_name = "images\\" + str(now) + '.png'
             cv2.imwrite(img_name, frame)
             print("{} written~!!".format(img_name))
             control_para = -1
@@ -247,7 +259,7 @@ def video_thread():
         elif control_para==2: # press space
             print("recording start!!")
             record = True
-            vid_name = str(now) + ".avi"
+            vid_name = "videos\\" + str(now) + ".avi"
             video = cv2.VideoWriter(vid_name, fourcc, 20.0, (frame.shape[1], frame.shape[0]))
             control_para = -1
 
@@ -552,6 +564,34 @@ def print_result(index_num, output_data):
 
 
 ##
+def confirm_keyword(test_data):
+    global global_flag
+
+    keyword_conf_interpreter.set_tensor(keyword_conf_input_details['index'], test_data)
+    keyword_conf_interpreter.invoke()
+    predictions = keyword_conf_interpreter.get_tensor(keyword_conf_output_details['index'])
+
+    a = np.argmax(predictions)
+
+    print('\n')
+    print(predictions[0][a])
+
+    if a == 0:
+        print("label : %d\t\tglobal flag : %d"%(a, global_flag))
+        print(keyword_label_dict[a])
+        print_text_to_gui(0)
+        global_flag = 0
+
+    else:
+        print("label : %d\t\tglobal flag : %d"%(a, global_flag))
+        print(keyword_label_dict[a])
+        print_text_to_gui(10)
+        global_flag = 1
+
+    return
+
+
+##
 def decoding_keyword(test_data):
     global end_time, global_flag
 
@@ -567,9 +607,13 @@ def decoding_keyword(test_data):
     print(predictions[0][a])
 
     if a == 0:
-        print("label : %d\t\tglobal flag : %d"%(a, global_flag))
-        print_text_to_gui(100)
-        print("it's not keyword...")
+        if predictions[0][a] != 1.0:
+            confirm_keyword(test_data, )
+        else:
+            print("label : %d\t\tglobal flag : %d"%(a, global_flag))
+            print_text_to_gui(100)
+            print("it's not keyword...")
+            global_flag = 0
     else:
         global_flag = 1
         print("label : %d\t\tglobal flag : %d"%(a, global_flag))
@@ -731,7 +775,7 @@ def confirm_command(test_data, label_para):
 
 #%%
 def kill_this_program():
-    process_name = "decoder_tflite_ver2.0.exe"
+    process_name = "PNC_ASR_Ver2.1.exe"
     for proc in psutil.process_iter():
         if proc.name() == process_name:
             proc.kill()
@@ -766,7 +810,7 @@ def run_gui():
     program_name['font'] = 'Times 20 bold'
     program_name.pack(anchor = 'w', side='bottom')
 
-    version_num = Label(root, text = 'Ver.2.0')
+    version_num = Label(root, text = 'Ver.2.1')
     version_num['fg'] = 'white'
     version_num['bg'] = 'black'
     version_num['font'] = 'Times 12 bold'

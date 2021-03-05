@@ -109,30 +109,42 @@ class residual_net_2D(layers.Layer):
         pooling_size_1 = (2, 1)
         pooling_size_2 = (2, 2)
 
-        x = self.residual_cnn_layer_3_0(inputs)
-        # x = self.residual_cnn_layer_3_1(x)
+        x = self.residual_cnn_layer_2_0(inputs)
+        x = self.residual_cnn_layer_2_1(x)
+        # x = self.residual_cnn_layer_3_2(x)
+        # x = self.residual_cnn_layer_3_3(x)
+        x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
+
+        x = self.residual_cnn_layer_3_0(x)
+        x = self.residual_cnn_layer_3_1(x)
+        x = self.residual_cnn_layer_3_2(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
         x = self.residual_cnn_layer_4_0(x)
-        # x = self.residual_cnn_layer_4_1(x)
+        x = self.residual_cnn_layer_4_1(x)
+        x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
+
+        x = self.residual_cnn_layer_4_4(x)
+        x = self.residual_cnn_layer_4_5(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
         x = self.residual_cnn_layer_5_0(x)
-        # x = self.residual_cnn_layer_5_1(x)
-        x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
-
-        x = self.residual_cnn_layer_5_4(x)
-        # x = self.residual_cnn_layer_5_5(x)
-        x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
-
-        x = self.residual_cnn_layer_6_0(x)
-        # x = self.residual_cnn_layer_6_1(x)
+        x = self.residual_cnn_layer_6_1(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
 
-        x = layers.GlobalAveragePooling2D()(x)
+        # x = layers.GlobalAveragePooling2D()(x)
         x = layers.Flatten()(x)
+        x = layers.LayerNormalization()(x)
+        x = layers.Dropout(0.3)(x)
+        x = layers.Dense(1000)(x)
+        # x = layers.Dense(128)(x)
+        # x = layers.LayerNormalization()(x)
+        # x = layers.Dropout(0.3)(x)
         # x = layers.Dense(256)(x)
+        # x = layers.LayerNormalization()(x)
+        # x = layers.Dropout(0.3)(x)
+        # x = layers.Dense(128)(x)
         x = layers.Dropout(0.3)(x)
         output_val = layers.Dense(num_class, activation='softmax')(x)
 

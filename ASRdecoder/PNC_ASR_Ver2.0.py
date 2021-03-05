@@ -105,7 +105,7 @@ img_label = Label(root, image=mic_photo, borderwidth=0)
 ## global model
 conv_shape = (199, 26, 1)
 
-test_bool = True
+test_bool = False
 
 ## keyword global model
 keyword_label_num = 2
@@ -237,7 +237,7 @@ def video_thread():
             break
 
         elif control_para==1:
-            img_name = str(now) + '.png'
+            img_name = "images\\" + str(now) + '.png'
             cv2.imwrite(img_name, frame)
             print("{} written~!!".format(img_name))
             control_para = -1
@@ -247,7 +247,7 @@ def video_thread():
         elif control_para==2: # press space
             print("recording start!!")
             record = True
-            vid_name = str(now) + ".avi"
+            vid_name = "videos\\" + str(now) + ".avi"
             video = cv2.VideoWriter(vid_name, fourcc, 20.0, (frame.shape[1], frame.shape[0]))
             control_para = -1
 
@@ -292,7 +292,6 @@ def video_control(command_para):
         control_para = 3
     elif command_para == 6:
         control_para = 4
-        time.sleep(1)
         vid_control.join()
 
     return
@@ -731,7 +730,7 @@ def confirm_command(test_data, label_para):
 
 #%%
 def kill_this_program():
-    process_name = "decoder_tflite_ver2.0.exe"
+    process_name = "PNC_ASR_Ver2.0.exe"
     for proc in psutil.process_iter():
         if proc.name() == process_name:
             proc.kill()
