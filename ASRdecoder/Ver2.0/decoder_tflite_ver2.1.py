@@ -5,6 +5,7 @@ import numpy as np
 import tensorflow as tf
 
 import time
+import os
 
 from tkinter import *
 import pyaudio as pa
@@ -16,7 +17,8 @@ import cv2
 import datetime
 
 stack = list()
-trigger_val = 150
+# trigger_val = 150
+trigger_val = 0.1
 
 sample_rate = 16000
 recording_time = 3
@@ -30,6 +32,7 @@ num = 0
 start_time, end_time = float(), float()
 global_flag = 0
 
+init_data_file = 'init_data_file.txt'
 
 keyword_label_dict = {0: 'None',
             1: 'hipnc'}
@@ -88,6 +91,12 @@ def text_mapping(input_num):
         return_text = "현재 녹화 중이지 않습니다."
     elif input_num == 200:
         return_text = "시동어를 입력하세요."
+    elif input_num == 201:
+        return_text = "잠시만 기다려 주세요."
+    elif input_num == 202:
+        return_text = "\"하이피앤씨\"를 말씀해 주세요."
+    elif input_num == 203:
+        return_text = "음성 인식 프로그램을 초기화 하고 있습니다."
     return return_text
 
 
@@ -343,7 +352,6 @@ def print_text_to_gui(input_num):
     return
 
 
-
 ##
 def standardization_func(data):
     return (data-np.mean(data))/np.std(data)
@@ -446,12 +454,40 @@ def generate_train_data(data):
 
 
 ##
+init_parameter = 0
+init_stack = list()
+init_max_val = 0
+def min_max_normalization(data):
+    return result
+
+
+##
 def receive_data(data, stack):
 
     global start_time
     global num, global_flag
+    global init_parameter, init_max_val
+    global init_stack
 
-    mean_val = np.mean(np.abs(data))
+    if init_parameter < 2:
+        if init_parameter == 0:
+            print_text_to_gui(201)
+            time.sleep(3)
+            print_text_to_gui(202)
+            init_parameter = 1
+
+        init_stack.extend(data)
+
+        if len(init_stack) == sample_rate*5:
+            init_max_val = np.max(init_stack)
+            init_parameter = 2
+            del init_stack
+            print_text_to_gui(200)
+
+        return
+
+    abs_data = np.abs(data)
+    mean_val = np.mean(abs_data-np.min(abs_data))/(init_max_val-np.min(abs_data))
 
     stack.extend(data)
 
@@ -519,6 +555,8 @@ def send_data(chunk, stream):
 ##
 def record_voice():
 
+    global init_parameter, init_max_val
+
     chunk = 400
     sample_format = pa.paInt16
     channels = 1
@@ -536,11 +574,22 @@ def record_voice():
 
     data = list()
 
-    print_text.set("시동어를 입력하세요...")
+    print_text.set("음성 인식 프로그램을 시작합니다.")
     label['fg'] = 'white'
     label['bg'] = 'black'
     label['font'] = 'Times 25 bold'
     label.pack(anchor='center', pady=pady_size)
+
+    if os.path.isfile('init_data_file.txt'):
+        with open('init_data_file.txt', 'w', encoding='utf-8') as f:
+            line = f.readline()
+            line = line.split()
+            init_parameter = int(line[0])
+            init_max_val = float(line[1])
+
+    else:
+        with open('init_data_file.txt', 'w', encoding='utf-8') as f:
+            f.write("0.0\t\t0.0\n") ## flag  \t\t max value
 
     send = threading.Thread(target=send_data, args=(chunk, stream))
     decoder = threading.Thread(target=receive_data, args=(data, stack))
@@ -549,6 +598,8 @@ def record_voice():
     decoder.start()
 
     run_gui()
+
+
 
     while True:
         time.sleep(0.1)
@@ -813,6 +864,9 @@ def insert_command_list():
 
 #%%
 def run_gui():
+
+    global init_parameter, init_max_val
+
     root.geometry('640x640')
     root.title('decoder')
     root.configure(bg='black')
@@ -833,6 +887,9 @@ def run_gui():
     insert_command_list()
 
     root.mainloop()
+
+    with open('init_data_file.txt', 'r', encoding='utf-8') as f:
+        f.write(str(init_parameter)+'\t\t'+str(init_max_val)+'\n')
 
     kill_this_program()
 

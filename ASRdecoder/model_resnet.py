@@ -32,10 +32,11 @@ class residual_cnn_block_2D(layers.Layer):
         # inputs = layers.BatchNormalization()(inputs)
 
         x = conv2d_layer_1(inputs)
-        # x = layers.BatchNormalization()(x)
+        x = layers.BatchNormalization()(x)
         x = tf.nn.relu(x)
+
         x = conv2d_layer_2(x)
-        # x = layers.BatchNormalization()(x)
+        x = layers.BatchNormalization()(x)
         # print('*********', self.chan_size)
         y = layers.Conv2D(self.chan_size[1], (1, 1), padding='same')(init_val)
         x = tf.math.add(y, x)
@@ -111,17 +112,19 @@ class residual_net_2D(layers.Layer):
 
         x = self.residual_cnn_layer_2_0(inputs)
         x = self.residual_cnn_layer_2_1(x)
-        # x = self.residual_cnn_layer_3_2(x)
-        # x = self.residual_cnn_layer_3_3(x)
+        x = self.residual_cnn_layer_2_2(x)
+        # x = self.residual_cnn_layer_2_3(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
         x = self.residual_cnn_layer_3_0(x)
         x = self.residual_cnn_layer_3_1(x)
         x = self.residual_cnn_layer_3_2(x)
+        x = self.residual_cnn_layer_3_3(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
         x = self.residual_cnn_layer_4_0(x)
         x = self.residual_cnn_layer_4_1(x)
+        x = self.residual_cnn_layer_4_2(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
         x = self.residual_cnn_layer_4_4(x)
@@ -129,6 +132,9 @@ class residual_net_2D(layers.Layer):
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
         x = self.residual_cnn_layer_5_0(x)
+        x = self.residual_cnn_layer_5_1(x)
+
+        x = self.residual_cnn_layer_6_0(x)
         x = self.residual_cnn_layer_6_1(x)
         x = layers.MaxPooling2D(pool_size=pooling_size_2, padding='same')(x)
 
@@ -136,7 +142,7 @@ class residual_net_2D(layers.Layer):
         # x = layers.GlobalAveragePooling2D()(x)
         x = layers.Flatten()(x)
         x = layers.LayerNormalization()(x)
-        x = layers.Dropout(0.3)(x)
+        x = layers.Dropout(0.2)(x)
         x = layers.Dense(1000)(x)
         # x = layers.Dense(128)(x)
         # x = layers.LayerNormalization()(x)
@@ -145,7 +151,7 @@ class residual_net_2D(layers.Layer):
         # x = layers.LayerNormalization()(x)
         # x = layers.Dropout(0.3)(x)
         # x = layers.Dense(128)(x)
-        x = layers.Dropout(0.3)(x)
+        x = layers.Dropout(0.2)(x)
         output_val = layers.Dense(num_class, activation='softmax')(x)
 
         return output_val

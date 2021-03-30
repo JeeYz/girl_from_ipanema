@@ -102,7 +102,7 @@ label_dict = {0: 'None',
 
 
 ## global model
-num_label = 2
+num_label = 7
 conv_shape = (199, 26, 1)
 
 input_vec = tf.keras.Input(shape=conv_shape)
@@ -124,13 +124,14 @@ model = tf.keras.Model(inputs=input_vec, outputs=answer)
 # parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_7.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_8.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_9.h5'
-parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_10.h5'
+# parameter_h5 = 'D:\\new_ver_train_data\\keyword_model_parameter_10.h5'
 
 # parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_2.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_3.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_6.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_10.h5'
+parameter_h5 = 'D:\\new_ver_train_data\\command_model_parameter_10_1.h5'
 
 # parameter_h5 = 'D:\\new_ver_train_data\\call_model_parameter.h5'
 # parameter_h5 = 'D:\\new_ver_train_data\\call_model_parameter_8.h5'
