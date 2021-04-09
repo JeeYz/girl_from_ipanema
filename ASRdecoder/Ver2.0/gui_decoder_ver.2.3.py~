@@ -334,7 +334,7 @@ def receive_data(data, stack):
                                             full_size = sample_rate*2,
                                             threshold_value=0.5)
             
-            print("+++++shape : {shape}".format(shape=data.shape))
+            print("shape : {shape}".format(shape=data.shape))
 
             decoding_voice(data)
 

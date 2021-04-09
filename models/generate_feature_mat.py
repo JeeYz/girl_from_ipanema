@@ -31,48 +31,9 @@ print("++shape : {shape}".format(shape=train_data.shape))
 
 
 input_vec = tf.keras.Input(shape=(32000,))
-#@tf.function
-#def extract_feature(input_data):
-#    spectrogram = tf.signal.stft(input_data, frame_length=255, frame_step=128)
-#    spectrogram = tf.abs(spectrogram)
-#    spectrogram = tf.expand_dims(spectrogram, -1)
-#    return spectrogram
 
-
-#
-#input_vec = tf.keras.Input(shape=(32000,))
-
-
-##
-#@tf.function
-#def extract_feature(input_data):
-#    spectrogram = tf.signal.stft(input_data, frame_length=255, frame_step=128)
-#    spectrogram = tf.abs(spectrogram)
-#    spectrogram = tf.expand_dims(spectrogram, -1)
-#    return spectrogram
-
-# spectrogram = np.asarray(spectrogram)
-#spectrogram = tf.stack(spectrogram)
-#input_vec = tf.stack(input_vec)
-#spectrogram = extract_feature(train_data)
-
-
-#spectrogram = tf.signal.stft(input_vec, frame_length=255, frame_step=128)
-#spectrogram = tf.abs(spectrogram)
-#spectrogram = tf.expand_dims(spectrogram, -1)
-
-
-
-#spectrogram = tf.keras.layers.Lambda(extract_feature, name='extract_feature')(input_vec)
-#
-#
-#
-#print("\n******************************\n")
-#print(spectrogram.shape)
-#print(spectrogram)
-#print("\n******************************\n")
-
-x = tf.expand_dims(input_vec, -1)
+x = tf.abs(input_vec)
+x = tf.expand_dims(x, -1)
 x = layers.Conv1D(32, 3, activation='relu')(x)
 x = layers.Conv1D(64, 3, activation='relu')(x)
 

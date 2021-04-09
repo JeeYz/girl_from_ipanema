@@ -118,7 +118,7 @@ def main():
 
 #    model = keras.models.load_model(command_h5, 
 #                        custom_objects={'extract_feature':extract})
-    model = keras.models.load_model(command_h5, compile=False)
+    model = keras.models.load_model(h5_one, compile=False)
     
     #export_path = save_path
     export_path = "D:\\" 
