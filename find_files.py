@@ -8,6 +8,7 @@ method0 : find files
 class utility_functions():
 
     def __init__(self):
+        self.files_list = list()
         return
 
 
@@ -15,11 +16,14 @@ class utility_functions():
 
         if 'target_path' in kwargs.keys():
             target_path = kwargs['target_path']
+        if 'target_ext' in kwargs.keys():
+            target_ext = kwargs['target_ext']
 
         for (path, dir, files) in os.walk(target_path):
             for filename in files:
                 ext = os.path.splitext(filename)[-1]
-                if ext == '.py':
+                if ext == target_ext:
                     print("%s/%s" % (path, filename))
+                    self.files_list.append(path+'\\'+filename)
     
         return
