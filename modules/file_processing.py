@@ -1,5 +1,4 @@
 # file processing modules
-
 import os
 
 
@@ -38,6 +37,17 @@ class FileProcessing():
 
 
 
+
+## test 
+print('hello, world~!!')
+
+test_class = FileProcessing()
+
+target_path = "/home/jy/.devjy/girl_from_ipanema/"
+target_ext = '.py'
+
+test_class.gen_target_files_list(target_path, target_ext)
+print(test_class.get_target_files_list())
 
 
 
