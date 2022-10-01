@@ -1,5 +1,6 @@
 
 print("hello, world~!!")
+print("test")
 
 class abc():
     def __init__(self):
