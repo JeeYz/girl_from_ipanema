@@ -1,3 +1,5 @@
+#import pyray
+import pygame
 
 print("hello, world~!!")
 print("test")
