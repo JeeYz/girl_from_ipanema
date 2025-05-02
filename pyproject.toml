@@ -1,0 +1,31 @@
+ [build-system]
+ requires = ["setuptools>=61.0"]
+ build-backend = "setuptools.build_meta"
+
+ [project]
+ name = "girl_from_ipanema"
+ version = "0.1.0"
+ description = "A sample Python project"
+ readme = "README.md"
+ requires-python = ">=3.8"
+ license = "MIT"
+ 
+ dependencies = [
+     "fastapi>=0.115.12",
+     "pipdeptree>=2.24.0",
+     "requests",
+     "ipykernel",
+     "numpy>=1.24.4",
+     "uvicorn[standard]>=0.33.0",
+     "sqlalchemy>=2.0.40",
+     "httpx>=0.28.1",
+     "faker>=35.2.2",
+     "pytest>=8.3.5",
+]
+
+[tool.setuptools]
+packages = ["src"]
+
+ [project.urls]
+ "Homepage" = "https://github.com/yourusername/girl_from_ipanema" # TODO: Update with your actual URL
+ "Bug Tracker" = "https://github.com/yourusername/girl_from_ipanema/issues" # TODO: Update with your actual URL
